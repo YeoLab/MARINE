@@ -12,7 +12,7 @@ from sys import getsizeof
 import time
 from tqdm import tqdm
 
-sys.path.append('src/')
+sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'src'))
 
 from read_process import incorporate_replaced_pos_info,incorporate_insertions_and_deletions,\
 get_positions_from_md_tag,reverse_complement,get_edit_information,get_edit_information_wrapper,\
@@ -64,7 +64,7 @@ def edit_finder(bam_filepath, output_folder, reverse_stranded, barcode_tag="CB",
     return overall_label_to_list_of_contents, results, total_seconds_for_reads_df
 
 
-def bam_processing(overall_label_to_list_of_contents, output_folder, barcode_tag='CB'):
+def bam_processing(overall_label_to_list_of_contents, output_folder, barcode_tag='CB', cores=1):
     split_bams_folder = '{}/split_bams'.format(output_folder)
     make_folder(split_bams_folder)
     contigs_to_generate_bams_for = get_contigs_that_need_bams_written(overall_label_to_list_of_contents, split_bams_folder, barcode_tag=barcode_tag)
@@ -72,7 +72,7 @@ def bam_processing(overall_label_to_list_of_contents, output_folder, barcode_tag
     
     
     # BAM Generation
-    total_bam_generation_time, total_seconds_for_bams = run_bam_reconfiguration(split_bams_folder, bam_filepath, overall_label_to_list_of_contents, contigs_to_generate_bams_for, barcode_tag=barcode_tag)
+    total_bam_generation_time, total_seconds_for_bams = run_bam_reconfiguration(split_bams_folder, bam_filepath, overall_label_to_list_of_contents, contigs_to_generate_bams_for, barcode_tag=barcode_tag, cores=cores)
     
     total_seconds_for_bams_df = pd.DataFrame.from_dict(total_seconds_for_bams, orient='index')
     total_seconds_for_bams_df.columns = ['seconds']
@@ -83,9 +83,9 @@ def bam_processing(overall_label_to_list_of_contents, output_folder, barcode_tag
     
     
     
-def coverage_processing(output_folder, barcode_tag='CB'):
+def coverage_processing(output_folder, barcode_tag='CB', cores=1):
     edit_info_grouped_per_contig_combined = gather_edit_information_across_subcontigs(output_folder, barcode_tag=barcode_tag)
-    results, total_time, total_seconds_for_contig = run_coverage_calculator(edit_info_grouped_per_contig_combined, output_folder, barcode_tag=barcode_tag)
+    results, total_time, total_seconds_for_contig = run_coverage_calculator(edit_info_grouped_per_contig_combined, output_folder, barcode_tag=barcode_tag, cores=cores)
     
     total_seconds_for_contig_df = pd.DataFrame.from_dict(total_seconds_for_contig, orient='index')
     total_seconds_for_contig_df.columns = ['seconds']
@@ -111,7 +111,7 @@ def print_marine_logo():
     pretty_print("Multi-core Algorithm for Rapid Identification of Nucleotide Edits", style="=")
 
     
-def run(bam_filepath, output_folder, contigs=[], num_intervals_per_contig=16, reverse_stranded=True, barcode_tag="CB", barcode_whitelist_file=None, verbose=False):
+def run(bam_filepath, output_folder, contigs=[], num_intervals_per_contig=1, reverse_stranded=True, barcode_tag="CB", barcode_whitelist_file=None, verbose=False):
     min_base_quality = 15
     min_dist_from_end = 5
     
@@ -152,7 +152,7 @@ def run(bam_filepath, output_folder, contigs=[], num_intervals_per_contig=16, re
     pretty_print("Splitting and reconfiguring BAMs to optimize coverage calculations", style="~")
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    total_bam_generation_time, total_seconds_for_bams_df = bam_processing(overall_label_to_list_of_contents, output_folder, barcode_tag=barcode_tag)
+    total_bam_generation_time, total_seconds_for_bams_df = bam_processing(overall_label_to_list_of_contents, output_folder, barcode_tag=barcode_tag, cores=num_intervals_per_contig)
     total_seconds_for_bams_df.to_csv("{}/bam_reconfiguration_timing.tsv".format(logging_folder), sep='\t')
     
     # Coverage calculation
@@ -160,7 +160,7 @@ def run(bam_filepath, output_folder, contigs=[], num_intervals_per_contig=16, re
     pretty_print("Total time to concat and write bams: {} minutes".format(round(total_bam_generation_time/60, 3)))
     pretty_print("Calculating coverage at edited sites", style='~')
     
-    results, total_time, total_seconds_for_contig_df = coverage_processing(output_folder, barcode_tag=barcode_tag)
+    results, total_time, total_seconds_for_contig_df = coverage_processing(output_folder, barcode_tag=barcode_tag, cores=num_intervals_per_contig)
     total_seconds_for_contig_df.to_csv("{}/coverage_calculation_timing.tsv".format(logging_folder), sep='\t')
 
         
@@ -227,7 +227,7 @@ if __name__ == '__main__':
     #default_bam_filepath = bulk_default_ct
     #default_bam_filepath = sc_whole_ct
 
-    default_bam_filepath = sc_subset_ct
+    default_bam_filepath = bulk_default_ct
     
     default_output_folder = '/projects/ps-yeolab3/ekofman/sailor2/scripts/{}'.format(output_names.get(default_bam_filepath))
     
@@ -274,5 +274,5 @@ if __name__ == '__main__':
         reverse_stranded=reverse_stranded,
         barcode_tag=barcode_tag,
         barcode_whitelist_file=barcode_whitelist_file,
-        num_intervals_per_contig=16
+        num_intervals_per_contig=cores
        )

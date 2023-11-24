@@ -42,7 +42,7 @@ def run_edit_identifier(bampath, output_folder, reverse_stranded=True, barcode_t
     results = []
     
     start_time = time.perf_counter()
-    with multiprocessing.Pool(processes=16) as p:
+    with multiprocessing.Pool(processes=num_intervals_per_contig) as p:
         max_ = len(edit_finding_jobs)
         with tqdm(total=max_) as pbar:
             for _ in p.imap_unordered(find_edits_and_split_bams_wrapper, edit_finding_jobs):
@@ -63,14 +63,14 @@ def run_edit_identifier(bampath, output_folder, reverse_stranded=True, barcode_t
 
 
 
-def run_bam_reconfiguration(split_bams_folder, bampath, overall_label_to_list_of_contents, contigs_to_generate_bams_for, barcode_tag='CB'):
+def run_bam_reconfiguration(split_bams_folder, bampath, overall_label_to_list_of_contents, contigs_to_generate_bams_for, barcode_tag='CB', cores=1):
     start_time = time.perf_counter()
 
     with pysam.AlignmentFile(bampath, "rb") as samfile:
         # Get the bam header, which will be used for each of the split bams too
         header_string = str(samfile.header)
 
-    num_processes = np.max([len(contigs_to_generate_bams_for), 16])
+    num_processes = np.max([len(contigs_to_generate_bams_for), cores])  # TODO: should be min?
     
     total_seconds_for_bams = {0: 1}
     total_bams = 0
@@ -215,7 +215,7 @@ def find_edits_and_split_bams_wrapper(parameters):
     
     
     
-def run_coverage_calculator(edit_info_grouped_per_contig_combined, output_folder, barcode_tag='CB'):
+def run_coverage_calculator(edit_info_grouped_per_contig_combined, output_folder, barcode_tag='CB', cores=1):
     coverage_counting_job_params = get_job_params_for_coverage_for_edits_in_contig(
         edit_info_grouped_per_contig_combined, 
         output_folder,
@@ -229,7 +229,7 @@ def run_coverage_calculator(edit_info_grouped_per_contig_combined, output_folder
     
     results = []
     # Spawn has to be used instead of the default fork when using the polars library
-    with get_context("spawn").Pool(processes=16) as p:
+    with get_context("spawn").Pool(processes=cores) as p:
         max_ = len(coverage_counting_job_params)
         with tqdm(total=max_) as pbar:
             for _ in p.imap_unordered(get_edit_info_for_barcode_in_contig_wrapper, coverage_counting_job_params):
