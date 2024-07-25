@@ -23,7 +23,7 @@ get_coverage_wrapper, write_reads_to_file, sort_bam, rm_bam, suffixes
 
 import os, psutil
 
-def run_edit_identifier(bampath, output_folder, strandedness, barcode_tag="CB", barcode_whitelist=None, contigs=[], num_intervals_per_contig=16, verbose=False, cores=64, min_read_quality = 0):
+def run_edit_identifier(bampath, output_folder, strandedness, barcode_tag="CB", barcode_whitelist=None, contigs=[], num_intervals_per_contig=16, verbose=False, cores=64, min_read_quality = 0, events=None):
     # Make subfolder in which to information about edits
     edit_info_subfolder = '{}/edit_info'.format(output_folder)
     make_folder(edit_info_subfolder)
@@ -54,7 +54,9 @@ def run_edit_identifier(bampath, output_folder, strandedness, barcode_tag="CB", 
                 # So the line overall_label_to_list_of_contents[_[0]][_[1]] =  _[2]
                 # is equivalent to overall_label_to_list_of_contents[contig][label] = barcode_to_concatted_reads_pl
                 pbar.update()
-
+                
+                events[contigs.index(_[0])].set()
+                
                 if barcode_tag: 
                     # Only keep this information for single cell requirements
                     overall_label_to_list_of_contents[_[0]][_[1]] =  _[2]

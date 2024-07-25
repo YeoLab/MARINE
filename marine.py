@@ -12,6 +12,7 @@ from scipy.special import betainc
 import shutil
 import sys
 from sys import getsizeof
+import threading
 import time
 from tqdm import tqdm
 import tracemalloc
@@ -48,7 +49,7 @@ def delete_intermediate_files(output_folder):
 
 
 def edit_finder(bam_filepath, output_folder, strandedness, barcode_tag="CB", barcode_whitelist=None, contigs=[], num_intervals_per_contig=16, 
-                verbose=False, cores=64, min_read_quality = 0):
+                verbose=False, cores=64, min_read_quality = 0, events=None):
     
     pretty_print("Each contig is being split into {} subsets...".format(num_intervals_per_contig))
     
@@ -63,7 +64,8 @@ def edit_finder(bam_filepath, output_folder, strandedness, barcode_tag="CB", bar
         num_intervals_per_contig=num_intervals_per_contig, 
         verbose=verbose,
         cores=cores,
-        min_read_quality=min_read_quality
+        min_read_quality=min_read_quality,
+        events=events
     )
 
     
@@ -250,6 +252,11 @@ def collate_edit_info_shards(output_folder):
     print("\tShape of collated edit info df: {}".format(collated_df.shape))
     print("\tColumns of collated edit info df: {}".format(collated_df.columns))
     return collated_df
+
+# Function to monitor events in separate threads
+def monitor_event(event, chunk_id, bam_reconfig_launcher):
+    event.wait()
+    print(f"Event {chunk_id} triggered, launching second pool for chunk {chunk_id}")
     
 def run(bam_filepath, annotation_bedfile_path, output_folder, contigs=[], num_intervals_per_contig=16, strandedness=True, barcode_tag="CB", paired_end=False, barcode_whitelist_file=None, verbose=False, coverage_only=False, filtering_only=False, annotation_only=False, bedgraphs_list=[], sailor=False, min_base_quality = 15, min_read_quality = 0, min_dist_from_end = 10, max_edits_per_read = None, cores = 64, number_of_expected_bams=4, 
         keep_intermediate_files=False,
@@ -265,7 +272,6 @@ def run(bam_filepath, annotation_bedfile_path, output_folder, contigs=[], num_in
     if len(dir) > 0: 
         pretty_print("WARNING {} is not empty".format(output_folder), style="^") 
 
-    
     logging_folder = "{}/metadata".format(output_folder)
     make_folder(logging_folder)
 
@@ -298,6 +304,15 @@ def run(bam_filepath, annotation_bedfile_path, output_folder, contigs=[], num_in
         pretty_print("Identifying edits", style="~")
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+        ctx = multiprocessing.get_context("spawn")
+        events = [ctx.Event() for _ in range(len(contigs))]
+        # Define and start a separate thread to monitor each event
+        threads = []
+        for i in range(len(events)):
+            thread = threading.Thread(target=monitor_event, args=(events[i], i))
+            thread.start()
+            threads.append(thread)
+
         overall_label_to_list_of_contents, results, total_seconds_for_reads_df, total_reads_processed, counts_summary_df = edit_finder(
             bam_filepath, 
             output_folder, 
@@ -308,8 +323,13 @@ def run(bam_filepath, annotation_bedfile_path, output_folder, contigs=[], num_in
             num_intervals_per_contig,
             verbose,
             cores=cores,
-            min_read_quality=min_read_quality
+            min_read_quality=min_read_quality,
+            events=events
         )
+    
+        # Wait for all threads to complete
+        for thread in threads:
+            thread.join()
         
         total_seconds_for_reads_df.to_csv("{}/edit_finder_timing.tsv".format(logging_folder), sep='\t')
         
