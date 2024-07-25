@@ -330,11 +330,11 @@ def run(bam_filepath, annotation_bedfile_path, output_folder, contigs=[], num_in
                 #total_seconds_for_bams_df.to_csv("{}/bam_reconfiguration_timing.tsv".format(logging_folder), sep='\t')
                 #pretty_print("Total time to concat and write bams: {} minutes".format(round(total_bam_generation_time/60, 3)))
             
-            
-        for c in contigs:
-            thread = threading.Thread(target=monitor_event, args=(events[c], c, bam_reconfig_launcher))
-            thread.start()
-            threads.append(thread)
+        if barcode_tag:
+            for c in contigs:
+                thread = threading.Thread(target=monitor_event, args=(events[c], c, bam_reconfig_launcher))
+                thread.start()
+                threads.append(thread)
 
         _, results, total_seconds_for_reads_df, total_reads_processed, counts_summary_df = edit_finder(
             bam_filepath, 
@@ -352,8 +352,9 @@ def run(bam_filepath, annotation_bedfile_path, output_folder, contigs=[], num_in
         )
     
         # Wait for all threads to complete
-        for thread in threads:
-            thread.join()
+        if barcode_tag:
+            for thread in threads:
+                thread.join()
         
         total_seconds_for_reads_df.to_csv("{}/edit_finder_timing.tsv".format(logging_folder), sep='\t')
         
