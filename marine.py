@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import argparse
+from collections import defaultdict
 from glob import glob
 from multiprocessing import Pool
 import multiprocessing
@@ -49,7 +50,7 @@ def delete_intermediate_files(output_folder):
 
 
 def edit_finder(bam_filepath, output_folder, strandedness, barcode_tag="CB", barcode_whitelist=None, contigs=[], num_intervals_per_contig=16, 
-                verbose=False, cores=64, min_read_quality = 0, events=None):
+                verbose=False, cores=64, min_read_quality = 0, events=None, overall_label_to_list_of_contents=None):
     
     pretty_print("Each contig is being split into {} subsets...".format(num_intervals_per_contig))
     
@@ -65,7 +66,8 @@ def edit_finder(bam_filepath, output_folder, strandedness, barcode_tag="CB", bar
         verbose=verbose,
         cores=cores,
         min_read_quality=min_read_quality,
-        events=events
+        events=events,
+        overall_label_to_list_of_contents=overall_label_to_list_of_contents
     )
 
     
@@ -91,10 +93,10 @@ def edit_finder(bam_filepath, output_folder, strandedness, barcode_tag="CB", bar
     return overall_label_to_list_of_contents, results, total_seconds_for_reads_df, overall_total_reads, counts_summary_df
 
 def bam_processing(overall_label_to_list_of_contents, output_folder, barcode_tag='CB', cores=1, number_of_expected_bams=4,
-                   verbose=False):
+                   verbose=False, contig=None):
     split_bams_folder = '{}/split_bams'.format(output_folder)
     make_folder(split_bams_folder)
-    contigs_to_generate_bams_for = get_contigs_that_need_bams_written(list(overall_label_to_list_of_contents.keys()),
+    contigs_to_generate_bams_for = get_contigs_that_need_bams_written([contig],
                                                                       split_bams_folder, 
                                                                       barcode_tag=barcode_tag,
                                                                       number_of_expected_bams=number_of_expected_bams
@@ -254,9 +256,10 @@ def collate_edit_info_shards(output_folder):
     return collated_df
 
 # Function to monitor events in separate threads
-def monitor_event(event, chunk_id, bam_reconfig_launcher):
+def monitor_event(event, contig, bam_reconfig_launcher):
     event.wait()
-    print(f"Event {chunk_id} triggered, launching second pool for chunk {chunk_id}")
+    #print(f"Event {contig} triggered, launching bam_reconfig_launcher(contig)")
+    bam_reconfig_launcher(contig)
     
 def run(bam_filepath, annotation_bedfile_path, output_folder, contigs=[], num_intervals_per_contig=16, strandedness=True, barcode_tag="CB", paired_end=False, barcode_whitelist_file=None, verbose=False, coverage_only=False, filtering_only=False, annotation_only=False, bedgraphs_list=[], sailor=False, min_base_quality = 15, min_read_quality = 0, min_dist_from_end = 10, max_edits_per_read = None, cores = 64, number_of_expected_bams=4, 
         keep_intermediate_files=False,
@@ -305,15 +308,35 @@ def run(bam_filepath, annotation_bedfile_path, output_folder, contigs=[], num_in
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         ctx = multiprocessing.get_context("spawn")
-        events = [ctx.Event() for _ in range(len(contigs))]
+        events = {c: ctx.Event() for c in contigs}
+        # Create a manager to manage shared data
+        manager = ctx.Manager()
+        # Create a shared dictionary
+        manager_dict = manager.dict()
+        overall_label_to_list_of_contents = defaultdict(list, manager_dict)
+        
         # Define and start a separate thread to monitor each event
         threads = []
-        for i in range(len(events)):
-            thread = threading.Thread(target=monitor_event, args=(events[i], i))
+        
+        def bam_reconfig_launcher(contig):
+            if barcode_tag:
+                # Make a subfolder into which the split bams will be placed
+                # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                #pretty_print("Contig processed\n\n\t{}".format(contig))
+                #pretty_print("Splitting and reconfiguring BAMs to optimize coverage calculations", style="~")
+                # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
+                total_bam_generation_time, total_seconds_for_bams_df = bam_processing(overall_label_to_list_of_contents, output_folder, barcode_tag=barcode_tag, cores=cores, number_of_expected_bams=number_of_expected_bams, verbose=verbose, contig=contig)
+                #total_seconds_for_bams_df.to_csv("{}/bam_reconfiguration_timing.tsv".format(logging_folder), sep='\t')
+                #pretty_print("Total time to concat and write bams: {} minutes".format(round(total_bam_generation_time/60, 3)))
+            
+            
+        for c in contigs:
+            thread = threading.Thread(target=monitor_event, args=(events[c], c, bam_reconfig_launcher))
             thread.start()
             threads.append(thread)
 
-        overall_label_to_list_of_contents, results, total_seconds_for_reads_df, total_reads_processed, counts_summary_df = edit_finder(
+        _, results, total_seconds_for_reads_df, total_reads_processed, counts_summary_df = edit_finder(
             bam_filepath, 
             output_folder, 
             strandedness,
@@ -324,7 +347,8 @@ def run(bam_filepath, annotation_bedfile_path, output_folder, contigs=[], num_in
             verbose,
             cores=cores,
             min_read_quality=min_read_quality,
-            events=events
+            events=events,
+            overall_label_to_list_of_contents=overall_label_to_list_of_contents
         )
     
         # Wait for all threads to complete
@@ -337,18 +361,6 @@ def run(bam_filepath, annotation_bedfile_path, output_folder, contigs=[], num_in
             f.write(f'total_reads_processed\t{total_reads_processed}\n') 
             for k, v in counts_summary_df.items():
                 f.write(f'{k}\t{v}\n') 
-
-        if barcode_tag:
-            # Make a subfolder into which the split bams will be placed
-            # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            pretty_print("Contigs processed\n\n\t{}".format(sorted(list(overall_label_to_list_of_contents.keys()))))
-            pretty_print("Splitting and reconfiguring BAMs to optimize coverage calculations", style="~")
-            # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-            total_bam_generation_time, total_seconds_for_bams_df = bam_processing(overall_label_to_list_of_contents, output_folder, barcode_tag=barcode_tag, cores=cores, number_of_expected_bams=number_of_expected_bams, verbose=verbose)
-            total_seconds_for_bams_df.to_csv("{}/bam_reconfiguration_timing.tsv".format(logging_folder), sep='\t')
-            pretty_print("Total time to concat and write bams: {} minutes".format(round(total_bam_generation_time/60, 3)))
-
         
     if not filtering_only and not skip_coverage:
         # Coverage calculation

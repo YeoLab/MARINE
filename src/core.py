@@ -23,7 +23,12 @@ get_coverage_wrapper, write_reads_to_file, sort_bam, rm_bam, suffixes
 
 import os, psutil
 
-def run_edit_identifier(bampath, output_folder, strandedness, barcode_tag="CB", barcode_whitelist=None, contigs=[], num_intervals_per_contig=16, verbose=False, cores=64, min_read_quality = 0, events=None):
+def safe_add(overall_label_to_list_of_contents, contig, label, chunk_data):
+    if not overall_label_to_list_of_contents[contig]:
+        overall_label_to_list_of_contents[contig] = {}
+    overall_label_to_list_of_contents[contig][label] = chunk_data
+
+def run_edit_identifier(bampath, output_folder, strandedness, barcode_tag="CB", barcode_whitelist=None, contigs=[], num_intervals_per_contig=16, verbose=False, cores=64, min_read_quality = 0, events=None, overall_label_to_list_of_contents=None):
     # Make subfolder in which to information about edits
     edit_info_subfolder = '{}/edit_info'.format(output_folder)
     make_folder(edit_info_subfolder)
@@ -35,8 +40,6 @@ def run_edit_identifier(bampath, output_folder, strandedness, barcode_tag="CB", 
     overall_total_reads = 0
     total_seconds_for_reads = {0: 1}
     
-    # Result containers
-    overall_label_to_list_of_contents = defaultdict(lambda:{})
     results = []
     
     start_time = time.perf_counter()
@@ -44,23 +47,28 @@ def run_edit_identifier(bampath, output_folder, strandedness, barcode_tag="CB", 
     all_counts_summary_dfs = []
     overall_count_summary_dict = defaultdict(lambda:0)
     
-    multiprocessing.set_start_method('spawn')
+    #multiprocessing.set_start_method('spawn')
     with get_context("spawn").Pool(processes=cores, maxtasksperchild=4) as p:
         max_ = len(edit_finding_jobs)
         with tqdm(total=max_) as pbar:
-            for _ in p.imap_unordered(find_edits_and_split_bams_wrapper, edit_finding_jobs):
+            for _ in p.imap(find_edits_and_split_bams_wrapper, edit_finding_jobs):
                 # values returned within array _ are:
                 # ~~~~  contig, label, barcode_to_concatted_reads_pl, total_reads, counts_df, time_df, total_time
-                # So the line overall_label_to_list_of_contents[_[0]][_[1]] =  _[2]
-                # is equivalent to overall_label_to_list_of_contents[contig][label] = barcode_to_concatted_reads_pl
                 pbar.update()
-                
-                events[contigs.index(_[0])].set()
+
+                contig = _[0]
+                label = _[1]
                 
                 if barcode_tag: 
                     # Only keep this information for single cell requirements
-                    overall_label_to_list_of_contents[_[0]][_[1]] =  _[2]
+                    safe_add(overall_label_to_list_of_contents, contig, label, _[2])
+                    #print('{} has {} chunks done'.format(contig, len(overall_label_to_list_of_contents[contig])))
 
+                    # Alert the main thread that all information for this contig has been gathered
+                    if len(overall_label_to_list_of_contents[contig]) == num_intervals_per_contig:
+                        #print('{} has {} chunks done'.format(contig, len(overall_label_to_list_of_contents[contig])))
+                        events[contig].set()
+                    
                 total_reads = _[3]
                 counts_summary_df = _[4]
                 all_counts_summary_dfs.append(counts_summary_df)
@@ -95,16 +103,17 @@ def run_bam_reconfiguration(split_bams_folder, bampath, overall_label_to_list_of
     
     total_seconds_for_bams = {0: 1}
     total_bams = 0
+    print("Reconfiguring contig {}".format(contigs_to_generate_bams_for[0]))
     with get_context("spawn").Pool(processes=num_processes, maxtasksperchild=4) as p:
         max_ = len(contigs_to_generate_bams_for)
-        with tqdm(total=max_) as pbar:
-            for _ in p.imap_unordered(concat_and_write_bams_wrapper, [[i[0], i[1], header_string, split_bams_folder, 
-                                                                       barcode_tag, number_of_expected_bams, verbose] for i in overall_label_to_list_of_contents.items() if i[0] in contigs_to_generate_bams_for]):
-                pbar.update()
-                
-                total_bams += 1
-                total_time = time.perf_counter() - start_time
-                total_seconds_for_bams[total_bams] = total_time
+        #with tqdm(total=max_) as pbar:
+        for _ in p.imap_unordered(concat_and_write_bams_wrapper, [[i[0], i[1], header_string, split_bams_folder, 
+                                                                   barcode_tag, number_of_expected_bams, verbose] for i in overall_label_to_list_of_contents.items() if i[0] in contigs_to_generate_bams_for]):
+            #pbar.update()
+            
+            total_bams += 1
+            total_time = time.perf_counter() - start_time
+            total_seconds_for_bams[total_bams] = total_time
 
     total_bam_generation_time = time.perf_counter() - start_time
     return total_bam_generation_time, total_seconds_for_bams

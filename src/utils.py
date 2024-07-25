@@ -85,7 +85,7 @@ def get_contigs_that_need_bams_written(expected_contigs, split_bams_folder, barc
     for c in expected_contigs:
         num_written_indices = subsets_per_contig.get(c, 0)
         if num_written_indices < number_of_expected_bams:
-            print("Contig {} has {}/{} bams generated".format(c, num_written_indices, number_of_expected_bams))
+            #print("Contig {} has {}/{} bams generated".format(c, num_written_indices, number_of_expected_bams))
             contigs_to_write_bams_for.append(c)
     
     return contigs_to_write_bams_for
@@ -590,7 +590,7 @@ def concat_and_write_bams(contig, df_dict, header_string, split_bams_folder, bar
     assert(barcode_tag in ['CB', 'IS', 'IB'])
     
     suffix_options = suffixes.get(barcode_tag)
-    print("\t{} suffixes".format(len(suffix_options)))
+    #print("\t{} suffixes".format(len(suffix_options)))
     
     for suffix in suffix_options:
         if barcode_tag:
