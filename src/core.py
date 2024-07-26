@@ -68,7 +68,15 @@ def run_edit_identifier(bampath, output_folder, strandedness, barcode_tag="CB", 
                     if len(overall_label_to_list_of_contents[contig]) == num_intervals_per_contig:
                         #print('{} has {} chunks done'.format(contig, len(overall_label_to_list_of_contents[contig])))
                         events[contig].set()
-                    
+
+                    configs_processed = len(overall_label_to_list_of_contents)
+                    if configs_processed > 3:
+                        print(overall_label_to_list_of_contents.keys())
+                        for key, e in events.items():
+                            if e.is_set():
+                                while e.is_set():
+                                    time.sleep(0.1) 
+                        
                 total_reads = _[3]
                 counts_summary_df = _[4]
                 all_counts_summary_dfs.append(counts_summary_df)
