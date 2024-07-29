@@ -334,7 +334,7 @@ def run(bam_filepath, annotation_bedfile_path, output_folder, contigs=[], num_in
 
         # Define a global barcode whitelist
         if barcode_whitelist_file:
-            barcode_whitelist = read_barcode_whitelist_file(barcode_whitelist_file, manager)
+            barcode_whitelist = read_barcode_whitelist_file(barcode_whitelist_file)
         else:
             barcode_whitelist = None
 

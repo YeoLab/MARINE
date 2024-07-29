@@ -10,7 +10,7 @@ import polars as pl
 from collections import defaultdict
 import multiprocessing
 from tqdm import tqdm
-from multiprocessing import get_context
+from multiprocessing import get_context, shared_memory
 
 from read_process import incorporate_replaced_pos_info,incorporate_insertions_and_deletions,\
 get_positions_from_md_tag,reverse_complement,get_edit_information,get_edit_information_wrapper,\
@@ -166,7 +166,12 @@ def find_edits(bampath, contig, split_index, start, end, output_folder, barcode_
         
     output_file = '{}/{}_{}_{}_{}_edit_info.tsv'.format(edit_info_subfolder, contig, split_index, start, end)
     remove_file_if_exists(output_file)
-    
+
+    if barcode_whitelist:
+        shm_name, shm_shape, shm_dtype = barcode_whitelist
+        shm = shared_memory.SharedMemory(name=shm_name)
+        whitelist_read_only_array = np.ndarray(shm_shape, dtype=shm_dtype, buffer=shm.buf)
+
     with open(output_file, 'w') as f:        
         write_header_to_edit_info(f)
 
@@ -189,11 +194,11 @@ def find_edits(bampath, contig, split_index, start, end, output_folder, barcode_
                     cell_barcode = read.get_tag("CB")
                 else:
                     cell_barcode = barcode
-
-                if cell_barcode not in barcode_whitelist:
+                    
+                if cell_barcode not in whitelist_read_only_array:
                     counts[contig]['Barcode Filtered'] += 1
                     continue
-            
+
             try:
                 error_code, list_of_rows, num_edits_of_each_type = get_read_information(read, contig, strandedness=strandedness, barcode_tag=barcode_tag, verbose=verbose, min_read_quality=min_read_quality)
             except Exception as e:
@@ -246,7 +251,10 @@ def find_edits(bampath, contig, split_index, start, end, output_folder, barcode_
     time_reporting[total_reads] = time.perf_counter() - start_time
     
     samfile.close()
-    
+
+    if barcode_whitelist:
+        shm.close()
+        
     return barcode_to_concatted_reads, total_reads, counts, time_reporting
         
 
@@ -255,7 +263,9 @@ def find_edits_and_split_bams(bampath, contig, split_index, start, end, output_f
                                                                          start, end, output_folder, barcode_tag=barcode_tag, strandedness=strandedness,
                                                                                  barcode_whitelist=barcode_whitelist, verbose=verbose,
                                                                                  min_read_quality=min_read_quality
-                                                                                )    
+                                                                                )  
+
+        
     return barcode_to_concatted_reads, total_reads, counts, time_reporting
     
     

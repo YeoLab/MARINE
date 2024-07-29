@@ -1,6 +1,7 @@
 import math
 from glob import glob
 import multiprocessing
+from multiprocessing import shared_memory
 import os
 import pysam
 import polars as pl
@@ -156,13 +157,25 @@ def get_contig_lengths_dict(bam_path):
                 
     return contig_lengths
 
-def read_barcode_whitelist_file(barcode_whitelist_file, manager):
+def read_barcode_whitelist_file(barcode_whitelist_file):
     barcode_whitelist = pd.read_csv(barcode_whitelist_file, names=['barcodes']).barcodes.tolist()
 
-    shared_list = manager.list(barcode_whitelist)
-    
-    pretty_print("Barcodes in whitelist: {}".format(len(shared_list)))
-    return shared_list
+    read_only_list = list(barcode_whitelist)
+
+    # Determine the maximum string length
+    max_length = max(len(s) for s in read_only_list)
+    dtype = f'U{max_length}'
+
+    # Convert list to a NumPy array with fixed-length string dtype
+    np_array = np.array(read_only_list, dtype=dtype)
+
+    # Create shared memory
+    shm = shared_memory.SharedMemory(create=True, size=np_array.nbytes)
+    shm_array = np.ndarray(np_array.shape, dtype=np_array.dtype, buffer=shm.buf)
+    np.copyto(shm_array, np_array)
+
+    pretty_print("Barcodes in whitelist: {}".format(len(read_only_list)))
+    return (shm.name, np_array.shape, np_array.dtype)
 
 
 def pretty_print(contents, style=''):
