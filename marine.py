@@ -301,24 +301,28 @@ def run(bam_filepath, annotation_bedfile_path, output_folder, contigs=[], num_in
         f.write('skip_coverage\t{}\n'.format(skip_coverage))
         
     if not (coverage_only or filtering_only):
-        if barcode_whitelist_file:
-            barcode_whitelist = read_barcode_whitelist_file(barcode_whitelist_file)
-        else:
-            barcode_whitelist = None
-
+        ctx = multiprocessing.get_context("spawn")
+        
         # Edit identification
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         pretty_print("Identifying edits", style="~")
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        ctx = multiprocessing.get_context("spawn")
+        
         events = {c: ctx.Event() for c in contigs}
         # Create a manager to manage shared data
         manager = ctx.Manager()
+        
         # Create a shared dictionary
         manager_dict = manager.dict()
         overall_label_to_list_of_contents = defaultdict(list, manager_dict)
-        
+
+        # Define a global barcode whitelist
+        if barcode_whitelist_file:
+            barcode_whitelist = read_barcode_whitelist_file(barcode_whitelist_file, manager)
+        else:
+            barcode_whitelist = None
+
         # Define and start a separate thread to monitor each event
         threads = []
         
@@ -336,7 +340,7 @@ def run(bam_filepath, annotation_bedfile_path, output_folder, contigs=[], num_in
 
                 event.clear()
         
-        if barcode_tag:
+        if barcode_tag:            
             for c in contigs:
                 thread = threading.Thread(target=monitor_event, args=(events[c], c, bam_reconfig_launcher))
                 thread.start()

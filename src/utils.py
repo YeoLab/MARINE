@@ -1,5 +1,6 @@
 import math
 from glob import glob
+import multiprocessing
 import os
 import pysam
 import polars as pl
@@ -94,9 +95,8 @@ def get_contigs_that_need_bams_written(expected_contigs, split_bams_folder, barc
 def make_edit_finding_jobs(bampath, output_folder, strandedness, barcode_tag="CB", barcode_whitelist=None, contigs=[], num_intervals_per_contig=16, verbose=False, min_read_quality = 0):
     jobs = []
     
-    samfile = pysam.AlignmentFile(bampath, "rb")
-    contig_lengths_dict = get_contig_lengths_dict(samfile)
-
+    contig_lengths_dict = get_contig_lengths_dict(bampath)
+    
     if verbose:
         print('contig_lengths_dict:{}'.format(contig_lengths_dict))
     if len(contigs) == 0:
@@ -121,12 +121,13 @@ def make_edit_finding_jobs(bampath, output_folder, strandedness, barcode_tag="CB
     return jobs
 
 
-def get_contig_lengths_dict(bam_handle):
+def get_contig_lengths_dict(bam_path):
     """
     Given a bam file handle, read the header to return a dictionary
     mapping contig names to lengths.
     """
-    header_lines = bam_handle.text.split("\t")
+    header_lines = pysam.AlignmentFile(bam_path, "rb").text.split("\t")
+    
     contig_lengths = {}
     found_sn = False
     found_ln = False
@@ -146,11 +147,13 @@ def get_contig_lengths_dict(bam_handle):
                 
     return contig_lengths
 
-def read_barcode_whitelist_file(barcode_whitelist_file):
-    barcode_whitelist = set(pd.read_csv(barcode_whitelist_file, names=['barcodes']).barcodes.tolist())
+def read_barcode_whitelist_file(barcode_whitelist_file, manager):
+    barcode_whitelist = pd.read_csv(barcode_whitelist_file, names=['barcodes']).barcodes.tolist()
+
+    shared_list = manager.list(barcode_whitelist)
     
-    pretty_print("Barcodes in whitelist: {}".format(len(barcode_whitelist)))
-    return barcode_whitelist
+    pretty_print("Barcodes in whitelist: {}".format(len(shared_list)))
+    return shared_list
 
 
 def pretty_print(contents, style=''):

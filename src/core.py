@@ -189,7 +189,7 @@ def find_edits(bampath, contig, split_index, start, end, output_folder, barcode_
                     cell_barcode = read.get_tag("CB")
                 else:
                     cell_barcode = barcode
-                    
+
                 if cell_barcode not in barcode_whitelist:
                     counts[contig]['Barcode Filtered'] += 1
                     continue
