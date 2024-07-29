@@ -66,7 +66,7 @@ def run_edit_identifier(bampath, output_folder, strandedness, barcode_tag="CB", 
 
                     # Alert the main thread that all information for this contig has been gathered
                     if len(overall_label_to_list_of_contents[contig]) == num_intervals_per_contig:
-                        #print('{} has {} chunks done'.format(contig, len(overall_label_to_list_of_contents[contig])))
+                        print('{} has {} chunks done'.format(contig, len(overall_label_to_list_of_contents[contig])))
                         events[contig].set()
 
                     configs_processed = len(overall_label_to_list_of_contents)
@@ -74,8 +74,8 @@ def run_edit_identifier(bampath, output_folder, strandedness, barcode_tag="CB", 
                         print(overall_label_to_list_of_contents.keys())
                         for key, e in events.items():
                             if e.is_set():
-                                while e.is_set():
-                                    time.sleep(0.1) 
+                                print("In {}, Found event for {} is set... waiting 5 seconds".format(contig, key))
+                                time.sleep(5)
                         
                 total_reads = _[3]
                 counts_summary_df = _[4]

@@ -96,13 +96,22 @@ def make_edit_finding_jobs(bampath, output_folder, strandedness, barcode_tag="CB
     jobs = []
     
     contig_lengths_dict = get_contig_lengths_dict(bampath)
-    
+
+    # Skip incorrectly specified contigs
+    new_contigs = []
+    for contig in contigs:
+        if contig not in contig_lengths_dict:
+            sys.stderr.write("User-specified contig {} not found in bam header... exiting.\n".format(contig))
+        else:
+            new_contigs.append(contig)
+            
     if verbose:
         print('contig_lengths_dict:{}'.format(contig_lengths_dict))
     if len(contigs) == 0:
         contigs_to_use = set(contig_lengths_dict.keys())
     else:
-        contigs_to_use = set(contigs)
+        contigs_to_use = set(new_contigs)
+        
     for contig in contig_lengths_dict.keys():
             
         if contig not in contigs_to_use:

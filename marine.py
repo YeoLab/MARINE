@@ -259,12 +259,27 @@ def collate_edit_info_shards(output_folder):
     print("\tColumns of collated edit info df: {}".format(collated_df.columns))
     return collated_df
 
-# Function to monitor events in separate threads
-def monitor_event(event, contig, bam_reconfig_launcher):
-    event.wait()
-    #print(f"Event {contig} triggered, launching bam_reconfig_launcher(contig)")
-    bam_reconfig_launcher(contig, event)
+def bam_reconfig_launcher(overall_label_to_list_of_contents, number_of_expected_bams, contig, event):
+    # Make a subfolder into which the split bams will be placed
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    #pretty_print("Contig processed\n\n\t{}".format(contig))
+    #pretty_print("Splitting and reconfiguring BAMs to optimize coverage calculations", style="~")
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    total_bam_generation_time, total_seconds_for_bams_df = bam_processing(overall_label_to_list_of_contents, output_folder, barcode_tag=barcode_tag, cores=cores, number_of_expected_bams=number_of_expected_bams, verbose=verbose, contig=contig)
+    #total_seconds_for_bams_df.to_csv("{}/bam_reconfiguration_timing.tsv".format(logging_folder), sep='\t')
+    #pretty_print("Total time to concat and write bams: {} minutes".format(round(total_bam_generation_time/60, 3)))
+
+    event.clear()
     
+# Function to monitor events in separate threads
+def monitor_event(event, contig, overall_label_to_list_of_contents, number_of_expected_bams):
+    event.wait()
+    print(f"Event {contig} triggered, launching bam_reconfig_launcher(contig)")
+    bam_reconfig_launcher(overall_label_to_list_of_contents, number_of_expected_bams, contig, event)
+
+
+                
 def run(bam_filepath, annotation_bedfile_path, output_folder, contigs=[], num_intervals_per_contig=16, strandedness=True, barcode_tag="CB", paired_end=False, barcode_whitelist_file=None, verbose=False, coverage_only=False, filtering_only=False, annotation_only=False, bedgraphs_list=[], sailor=False, min_base_quality = 15, min_read_quality = 0, min_dist_from_end = 10, max_edits_per_read = None, cores = 64, number_of_expected_bams=4, 
         keep_intermediate_files=False,
         skip_coverage=False):
@@ -325,25 +340,13 @@ def run(bam_filepath, annotation_bedfile_path, output_folder, contigs=[], num_in
 
         # Define and start a separate thread to monitor each event
         threads = []
-        
-        def bam_reconfig_launcher(contig, event):
-            if barcode_tag:
-                # Make a subfolder into which the split bams will be placed
-                # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                #pretty_print("Contig processed\n\n\t{}".format(contig))
-                #pretty_print("Splitting and reconfiguring BAMs to optimize coverage calculations", style="~")
-                # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
-                total_bam_generation_time, total_seconds_for_bams_df = bam_processing(overall_label_to_list_of_contents, output_folder, barcode_tag=barcode_tag, cores=cores, number_of_expected_bams=number_of_expected_bams, verbose=verbose, contig=contig)
-                #total_seconds_for_bams_df.to_csv("{}/bam_reconfiguration_timing.tsv".format(logging_folder), sep='\t')
-                #pretty_print("Total time to concat and write bams: {} minutes".format(round(total_bam_generation_time/60, 3)))
 
-                event.clear()
-        
+        thread_for_contig = {}
         if barcode_tag:            
             for c in contigs:
-                thread = threading.Thread(target=monitor_event, args=(events[c], c, bam_reconfig_launcher))
+                thread = threading.Thread(target=monitor_event, args=(events[c], c, overall_label_to_list_of_contents, number_of_expected_bams))
                 thread.start()
+                thread_for_contig[thread.name] = c
                 threads.append(thread)
 
         _, results, total_seconds_for_reads_df, total_reads_processed, counts_summary_df = edit_finder(
@@ -360,12 +363,19 @@ def run(bam_filepath, annotation_bedfile_path, output_folder, contigs=[], num_in
             events=events,
             overall_label_to_list_of_contents=overall_label_to_list_of_contents
         )
+        
     
         # Wait for all threads to complete
         if barcode_tag:
+            print("Trying to join all threads...")
             for thread in threads:
-                thread.join()
-        
+                print('Joining thread {} for {}'.format(thread.name, thread_for_contig.get(thread.name)))
+                thread.join(timeout=300)
+                if thread.is_alive():
+                    print('Thread {} for {} did not finish in time'.format(thread.name, thread_for_contig.get(thread.name)))
+                else:
+                    print('Thread {} for {} has finished'.format(thread.name, thread_for_contig.get(thread.name)))
+
         total_seconds_for_reads_df.to_csv("{}/edit_finder_timing.tsv".format(logging_folder), sep='\t')
         
         with open('{}/manifest.txt'.format(logging_folder), 'a+') as f:
