@@ -26,5 +26,5 @@ $MARINE/tests/singlecell_tests/edge_case_test \
 --cores \
 4 \
 --barcode_tag "CB" \
---strandedness 2 --num_per_sublist 1 --verbose \
+--strandedness 2 --num_per_sublist 1 \
 --contigs 10 --interval_length 40000000 --keep_intermediate_files

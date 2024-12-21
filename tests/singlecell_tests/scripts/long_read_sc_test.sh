@@ -18,4 +18,4 @@ $MARINE/tests/singlecell_tests/long_read_sc_test \
 --barcode_tag "IB" \
 --contigs "6" \
 --num_intervals_per_contig 4 \
---keep_intermediate_files --verbose
+--keep_intermediate_files

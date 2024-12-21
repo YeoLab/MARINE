@@ -16,5 +16,5 @@ $MARINE/tests/singlecell_tests/edge_case_filter_dist_test \
 4 \
 --min_dist_from_end 2 \
 --barcode_tag "CB" \
---strandedness 2 --num_per_sublist 1 --verbose \
+--strandedness 2 --num_per_sublist 1 \
 --contigs 10 --interval_length 40000000 --keep_intermediate_files

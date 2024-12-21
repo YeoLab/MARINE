@@ -17,5 +17,4 @@ $MARINE/tests/strandedness_tests/F1R2_pair_test-single_end_mode \
 --strandedness 2 \
 --contigs "chr17" \
 --sailor \
---verbose \
 --interval_length 48000000 --keep_intermediate_files

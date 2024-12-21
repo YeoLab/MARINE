@@ -13,5 +13,5 @@ $MARINE/tests/singlecell_tests/only_5_cells_bulk_mode_test \
 0 \
 --cores \
 4 \
---strandedness 2 --verbose \
+--strandedness 2 \
 --contigs "9" --interval_length 32000000 --keep_intermediate_files
