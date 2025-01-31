@@ -7,6 +7,7 @@ import pandas as pd
 import numpy as np
 import sys
 import subprocess
+import tracemalloc
 from collections import OrderedDict, defaultdict
 from itertools import product
 from scipy.special import betainc
@@ -1054,9 +1055,11 @@ def get_edits_with_coverage_df(output_folder,
     # this will still be true even with no barcode specified, in which case the contig will be <contig>_no_barcode
     
     # Therefore: replace the contig with the part before the barcode
-    all_edit_info_unique_position_with_coverage_df['contig'] = all_edit_info_unique_position_with_coverage_df.apply(lambda row: row['contig'].replace('_{}'.format(row['barcode']), ''), axis=1)
-
-    return all_edit_info_unique_position_with_coverage_df
+    if len(all_edit_info_unique_position_with_coverage_df) > 0:
+        all_edit_info_unique_position_with_coverage_df['contig'] = all_edit_info_unique_position_with_coverage_df.apply(lambda row: row['contig'].replace('_{}'.format(row['barcode']), ''), axis=1)
+        return all_edit_info_unique_position_with_coverage_df
+    else:
+        return all_edit_info_unique_position_with_coverage_df
         
 
 

@@ -534,8 +534,11 @@ def run(bam_filepath, annotation_bedfile_path, output_folder, contigs=[], strand
             f.write(f'total_reads_processed\t{overall_total_reads_processed}\n') 
             for k, v in overall_counts_summary_df.items():
                 f.write(f'{k}\t{v}\n') 
-
-            f.write(f'edits per read (EPR)\t{overall_counts_summary_df.get("total_edits")/overall_total_reads_processed}\n')
+            total_edits = overall_counts_summary_df.get("total_edits", 0)
+            if total_edits > 0:
+                f.write(f'edits per read (EPR)\t{total_edits/overall_total_reads_processed}\n')
+            else:
+                f.write(f'edits per read (EPR)\t{0}\n')
 
     reconfigured_bam_filepaths = glob('{}/split_bams/*/*.bam'.format(output_folder))
         
