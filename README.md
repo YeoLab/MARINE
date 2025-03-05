@@ -42,8 +42,8 @@ conda activate marine_environment
 or if you encounter problems with this approach, try using mamba instead, which can be faster:
 
 ```
-conda install -c conda-forge mamba=1.5.11 -y 
-mamba create -n marine_environment python=3.8.18 -y
+conda install -c conda-forge mamba=1.5.12 -y
+mamba create -n marine_environment python=3.10 -y
 mamba env update -n marine_environment --file marine_environment2.yaml
 conda activate marine_environment
 ```
