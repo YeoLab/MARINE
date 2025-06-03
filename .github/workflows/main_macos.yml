@@ -1,0 +1,43 @@
+name: integration_test_macos
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      # 1) Install Miniconda (or Mambaforge) on macOS
+      - name: Setup Miniconda (macOS)
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          miniforge-variant: Mambaforge    # installs Mamba-enabled Miniforge
+          python-version: 3.10            # (optional) pins Python 3.10 in base
+          activate-environment: false     # we’ll explicitly create our own env next
+          auto-update-conda: true
+
+      # 2) Now `conda` and `mamba` are on the PATH
+      - name: Create Conda Environment (macOS)
+        run: |
+          # “setup-miniconda” put `conda` (and `mamba`) in PATH, so we can call it directly.
+          mamba create -n marine_environment python=3.10 -y
+          mamba env update -n marine_environment --file marine_environment2.yaml
+
+      - name: Run Integration Tests (macOS)
+        run: |
+          # Initialize Conda in bash and activate the env
+          conda init bash
+          CONDA_BASE=$(conda info --base) ; source $CONDA_BASE/etc/profile.d/conda.sh
+          conda activate marine_environment
+
+          # Confirm python path and run tests
+          which python
+          cd tests
+          bash integration_tests_run.sh $(which python)
