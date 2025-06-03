@@ -18,7 +18,7 @@ jobs:
 
       - name: Install Mamba
         run: |
-          conda install -c conda-forge mamba=1.5.12 -y 
+          conda install -c conda-forge mamba=1.5.12 python=3.10 -y 
           
       - name: Print conda folder contents
         run: |
