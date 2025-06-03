@@ -18,9 +18,9 @@ jobs:
         uses: conda-incubator/setup-miniconda@v2
         with:
           miniforge-variant: Mambaforge
-          miniforge-version: latest       # required when you specify `architecture`
+          miniforge-version: latest       
           architecture: arm64
-          python-version: 3.10             # not 3.1!
+          python-version: 3.10             
           activate-environment: false
           auto-update-conda: true
 
