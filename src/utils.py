@@ -128,7 +128,7 @@ def generate_bedgraphs(final_site_level_information_df, conversions_list, output
     pretty_print("Making bedgraphs for {} conversions...\n".format(conversions_list))
     for conversion in conversions_list:
         conversion_search = conversion[0] + '>' + conversion[1]
-        sites_for_conversion = final_site_level_information_df[final_site_level_information_df.conversion == conversion_search]
+        sites_for_conversion = final_site_level_information_df[final_site_level_information_df.strand_conversion == conversion_search]
         sites_for_conversion['edit_fraction'] = sites_for_conversion['count']/sites_for_conversion['coverage']
         sites_for_conversion['start'] = sites_for_conversion['position'] - 1
         sites_for_conversion_bedgraph_cols = sites_for_conversion[['contig', 'start', 'position', 'edit_fraction']]
