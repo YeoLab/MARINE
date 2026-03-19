@@ -26,6 +26,7 @@ jobs:
           ls /usr/share/miniconda/bin/
           ls /usr/share/miniconda/
            
+      # I want to see if this step still works in Mar 2026
       - name: Create Conda Environment
         run: |
           /usr/share/miniconda/bin/mamba create -n marine_environment python=3.10 -y
