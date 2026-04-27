@@ -1,0 +1,43 @@
+TDAD Impact Analysis
+====================
+Stage:         2.75-tdad
+Timestamp:     2026-04-26T03:07:00Z
+Base branch:   main
+Method:        AST static import analysis (no runtime imports)
+
+NOTE: No git diff available (brian_dev has not diverged from main with committed
+changes). Changed files derived from architect task list (tasks 04-08, 10, 12).
+
+Changed files: 4
+Affected tests: 1
+Risk level: HIGH (0.65)
+
+Mappings:
+  src/utils.py        -> tests/unittests.py
+  src/read_process.py -> tests/unittests.py
+  marine.py           -> (none)
+  src/core.py         -> (none)
+
+Unmatched (no covering tests detected by static import analysis):
+  marine.py   [WARN: no test coverage detected by import analysis]
+              [NOTE: tasks 07+08 will add static-source tests for marine.py]
+  src/core.py [WARN: no test coverage detected by import analysis]
+              [NOTE: covered only by integration_tests_run.sh end-to-end suite]
+
+Integration test file (tests/integration_tests_auto_check.py):
+  This file reads output TSV/h5ad files produced by a full MARINE run.
+  It does NOT import marine/core/utils/read_process at the module level.
+  It exercises marine.py and src/core.py indirectly via CLI execution.
+  Static import analysis cannot capture this coverage.
+
+Recommendations for downstream stages:
+  - test-scaffold: prioritize generating unit tests for marine.py and
+    src/core.py — both are unmatched (no unit test coverage)
+  - implement: run tests/unittests.py after each change to src/utils.py
+    or src/read_process.py; also run integration_tests_run.sh after
+    changes to marine.py or src/core.py
+  - tasks 02+03 (test-first): add tests for get_intervals and
+    get_coverage_wrapper in tests/unittests.py before tasks 04+05 apply
+    their bug fixes
+  - tasks 07+08 (static-source tests): will reduce marine.py unmatched
+    status once committed

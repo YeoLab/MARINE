@@ -1,0 +1,26 @@
+{
+  "stage": "2-architect",
+  "phase": "explore-complete",
+  "updated_utc": "2026-04-25T09:25:00Z",
+  "exploration": {
+    "files_analyzed": 4,
+    "bug_locations_verified": 5,
+    "integration_points_mapped": 3,
+    "constraints_identified": 6,
+    "patterns_to_follow": [
+      "unittest.TestCase + unittest.main() at file end",
+      "sys.path.append('../src/') in tests",
+      ".format() inside run() body and src/utils.py older functions",
+      "f-strings inside __main__ block of marine.py",
+      "no new imports, no new dependencies"
+    ],
+    "risks": {
+      "high": ["integration test regression"],
+      "medium": ["test CWD dependency on tests/ directory"],
+      "low": ["tracemalloc multiple-start (harmless)", "Pool default-processes already 4"]
+    }
+  },
+  "ready_for_design": true,
+  "hotspot_data_present": false,
+  "conflicts_resolved_present": false
+}

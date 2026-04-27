@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0.0",
+  "stage_id": "1-requirements",
+  "stage_name": "Requirements",
+  "status": "COMPLETE",
+  "completed_utc": "2026-04-25T09:19:00Z",
+  "updated_utc": "2026-04-25T09:19:00Z",
+  "decision": {"gate_result": "PASS", "rationale": "11 context files produced, all acceptance criteria mapped, no ambiguity gaps, ready for architect."},
+  "outputs": [
+    {"path": ".forge/stages/1-requirements/architect-prompt.md", "description": "Architect-ready prompt with 11 acceptance criteria"},
+    {"path": ".forge/stages/1-requirements/context/01-vision-and-goals.md", "description": "Bug-fix-only scope, ranked goals"},
+    {"path": ".forge/stages/1-requirements/context/02-user-experience.md", "description": "CLI and library UX impact per bug"},
+    {"path": ".forge/stages/1-requirements/context/03-user-flows.md", "description": "Pipeline flows annotated with crash points"},
+    {"path": ".forge/stages/1-requirements/context/04-data-models.md", "description": "Interval list, coverage filename, timing vars"},
+    {"path": ".forge/stages/1-requirements/context/05-business-logic.md", "description": "Exact fix spec per bug with line numbers"},
+    {"path": ".forge/stages/1-requirements/context/06-api-integrations.md", "description": "N/A justification + changed function contracts"},
+    {"path": ".forge/stages/1-requirements/context/07-security-requirements.md", "description": "N/A — offline pipeline"},
+    {"path": ".forge/stages/1-requirements/context/08-edge-cases.md", "description": "8 edge cases for get_intervals, tracemalloc, Pool, format"},
+    {"path": ".forge/stages/1-requirements/context/09-acceptance-criteria.md", "description": "11 detailed ACs with verification commands"},
+    {"path": ".forge/stages/1-requirements/context/10-technical-constraints.md", "description": "Python 3.10, no new deps, surgical changes"},
+    {"path": ".forge/stages/1-requirements/context/11-code-references.md", "description": "Exact file paths and line numbers for all 5 bugs"}
+  ],
+  "next_stage": "2-architect",
+  "resumption_context": "Requirements packaged into 11 context files plus architect-prompt.md. FR-1..11 cover 5 bug fixes + tracemalloc move + test requirements. Python 3.10 constraint, surgical changes only, tests required for all changed logic."
+}

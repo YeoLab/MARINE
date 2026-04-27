@@ -1,0 +1,143 @@
+{
+  "schema_version": "1.0.0",
+  "stage": "2-architect",
+  "generated_utc": "2026-04-25T10:00:00Z",
+  "revision_note": "Extended 2026-04-25 to add A-10..A-14 covering Google-docstring style, the audit's evidence model, and the conservative-keep policy. Original A-1..A-9 unchanged.",
+  "assumptions": [
+    {
+      "id": "A-1",
+      "statement": "The `processes` parameter in generate_and_split_bed_files_for_all_positions (default=4) is intentionally distinct from `cores` in run() (default=64); the function is designed to use a smaller fixed parallelism for the split step.",
+      "default_value": "processes=4 (existing function default)",
+      "confidence": "high",
+      "rationale": "Function signature already declares processes=4; using `cores` was a copy-paste error since cores is not in scope.",
+      "invalidation_impact": "If a future caller wants to scale this Pool with --cores, they would have to pass it explicitly via the processes kwarg. No current caller does so.",
+      "rollback": "Restore Pool(processes=cores) and add `cores` to the function signature."
+    },
+    {
+      "id": "A-2",
+      "statement": "tracemalloc.start() placed at the top of run() does not cause errors if run() is invoked multiple times.",
+      "default_value": "place at top of run() unconditionally",
+      "confidence": "high",
+      "rationale": "Python stdlib documents that calling tracemalloc.start() while already tracing is a no-op (does not raise).",
+      "invalidation_impact": "If a future Python release changes this, double-start could raise. Mitigation: guard with `if not tracemalloc.is_tracing()`.",
+      "rollback": "Add the is_tracing() guard."
+    },
+    {
+      "id": "A-3",
+      "statement": "Removing `start_time = time.time()` from the __main__ block is safe because start_time is not referenced in __main__ after the run() call.",
+      "default_value": "remove from __main__",
+      "confidence": "high",
+      "rationale": "Verified by reading marine.py lines 654-682 — no post-run reference to start_time exists.",
+      "invalidation_impact": "If a hidden post-run reference is found (e.g., elapsed-time logging), it would raise NameError after this change.",
+      "rollback": "Restore start_time = time.time() in __main__."
+    },
+    {
+      "id": "A-4",
+      "statement": "marine2.py can be deleted via `git rm` without breaking any import, test, or CI step.",
+      "default_value": "git rm marine2.py",
+      "confidence": "high",
+      "rationale": "Confirmed: not in CI workflow, not imported anywhere, not mentioned in README.",
+      "invalidation_impact": "If a hidden import is found, the import fails at module load.",
+      "rollback": "git restore marine2.py from HEAD~1."
+    },
+    {
+      "id": "A-5",
+      "statement": "Removing `header=False` from the .format() call in get_coverage_wrapper is purely a bug fix — no observable behavior changes for the filename string itself.",
+      "default_value": "remove `, header=False`",
+      "confidence": "high",
+      "rationale": "str.format() raises TypeError for unknown kwargs before producing output; removing it produces the intended filename string.",
+      "invalidation_impact": "None — the kwarg never reached any output channel.",
+      "rollback": "No rollback needed."
+    },
+    {
+      "id": "A-6",
+      "statement": "New unit tests for get_intervals do not need real BAM files or pysam; the function operates only on a dict of contig lengths.",
+      "default_value": "no file I/O in new tests",
+      "confidence": "high",
+      "rationale": "Function source is pure arithmetic over a dict-lookup result.",
+      "invalidation_impact": "If get_intervals gains I/O dependencies, the unit tests would need fixtures or mocks.",
+      "rollback": "Refactor tests to use mocks."
+    },
+    {
+      "id": "A-7",
+      "statement": "Static-source inspection via inspect.getsource() is a sufficient and stable way to verify that start_time and tracemalloc.start() are placed inside run() and that Pool uses the processes parameter.",
+      "default_value": "use inspect.getsource() in unit tests",
+      "confidence": "medium",
+      "rationale": "The fixes are textual placements; inspect.getsource() reads the source as written. This avoids the need to call run() with mock arguments (heavy due to subprocess/pysam dependencies).",
+      "invalidation_impact": "If marine.py is later compiled to bytecode without source, getsource fails. Mitigation: behavioral tests via mocked run() if compilation is introduced.",
+      "rollback": "Replace static-source tests with behavioral tests that call run() with stubbed dependencies."
+    },
+    {
+      "id": "A-8",
+      "statement": "Test sequence (write test red, then apply fix to green) is preferred over apply-then-test, even though both yield the same final state.",
+      "default_value": "test-first ordering for H5 and C4",
+      "confidence": "medium",
+      "rationale": "Test-first proves the test detects the bug before declaring the fix correct. For static-source tests, this is especially important to confirm the assertion is meaningful.",
+      "invalidation_impact": "If the build agent has trouble running partial states (red, then green), a one-shot apply-then-test mode is acceptable.",
+      "rollback": "Switch to one-shot Approach A (apply all, test once)."
+    },
+    {
+      "id": "A-9",
+      "statement": "The integration test `bash integration_tests_run.sh python` exits 0 in the current pre-fix state of the repository (i.e., the pre-existing tests are not already broken).",
+      "default_value": "assume green baseline",
+      "confidence": "medium",
+      "rationale": "The brian_dev branch is the active development branch; CI is configured against this branch.",
+      "invalidation_impact": "If integration tests are already red, regressions cannot be attributed to this stage's changes.",
+      "rollback": "Run `bash integration_tests_run.sh python` against HEAD before starting task-01 to establish baseline."
+    },
+    {
+      "id": "A-10",
+      "statement": "Google-style is the appropriate docstring format for this project. The project does not currently use Sphinx auto-doc, NumPy-style, or any other format that would conflict.",
+      "default_value": "Google-style with Args:/Returns:/Raises:",
+      "confidence": "high",
+      "rationale": "The four target files have no existing docstrings in any format. No pyproject.toml or setup.cfg specifies a doc build system. The user explicitly requested Google-style.",
+      "invalidation_impact": "If the project later adopts Sphinx with napoleon, Google-style is supported by default. If it adopts NumPy-style explicitly, the docstrings would need a one-time conversion (mechanical, ~96 functions).",
+      "rollback": "Convert with a script using docstring-parser or similar; not a manual rewrite."
+    },
+    {
+      "id": "A-11",
+      "statement": "The 96-function count across marine.py, src/core.py, src/utils.py, src/read_process.py is correct at the start of task-10. (11 + 18 + 53 + 14 = 96.)",
+      "default_value": "96 total",
+      "confidence": "high",
+      "rationale": "Verified by `grep -c '^def '` on each file at architect-stage time. The Package A bug fixes (tasks 1-9) do not add or remove functions, only edit existing lines, so the count carries through to task-10 unchanged.",
+      "invalidation_impact": "If the count differs at task-10 execution time, task-10 step 1 explicitly halts and reports.",
+      "rollback": "Re-run `grep -c '^def '` and update the inventory."
+    },
+    {
+      "id": "A-12",
+      "statement": "Whole-word grep plus AST-based ImportFrom enumeration is sufficient to detect all internal usage of a function name in this codebase. No dynamic dispatch, no metaclass tricks, no string-based lookups exist.",
+      "default_value": "use grep + ast for the audit",
+      "confidence": "high",
+      "rationale": "Verified by an exhaustive grep for `globals()|getattr|eval(|exec(|importlib|__import__` across the four target files at audit time — zero matches. Recorded as architecture plan Section 13.",
+      "invalidation_impact": "If dynamic dispatch is added later (e.g., a plugin registry), the audit would falsely classify the dispatched function as REMOVE_CANDIDATE. Mitigation: re-run the dynamic-dispatch grep at task-11 execution time before trusting the audit results.",
+      "rollback": "Add the dispatched function to a manual KEEP allowlist in the audit script."
+    },
+    {
+      "id": "A-13",
+      "statement": "The four target files (marine.py, src/core.py, src/utils.py, src/read_process.py) contain no `__all__` declaration. Every top-level function is potentially-public from the perspective of any importer.",
+      "default_value": "treat every name as potentially-public; defer to KEEP-rules for actual usage",
+      "confidence": "high",
+      "rationale": "Verified by `grep -n '^__all__'` returning zero matches.",
+      "invalidation_impact": "If `__all__` is added in the future, the audit should restrict its REMOVE_CANDIDATE pool to names NOT in `__all__`.",
+      "rollback": "Update task-11 audit script to read `__all__` if present."
+    },
+    {
+      "id": "A-14",
+      "statement": "The audit cannot see consumers outside this repository (e.g., user notebooks, downstream scripts, packaging). Functions used only by external consumers will be misclassified as REMOVE_CANDIDATE and may be deleted.",
+      "default_value": "accept the risk; rely on human review of unused-functions-audit.json before task-12 acts",
+      "confidence": "medium",
+      "rationale": "The MARINE repo is a CLI tool with documented entry points (run() in marine.py). External consumers would normally use the CLI, not import internal helpers. But notebook usage cannot be ruled out.",
+      "invalidation_impact": "If a downstream consumer breaks after task-12 deletes a function, the fix is to revert that specific deletion and reclassify in the audit.",
+      "rollback": "git revert the task-12 commit and update unused-functions-audit.json to mark the deleted function KEEP with rule 'external_consumer_break'."
+    },
+    {
+      "id": "A-15",
+      "statement": "Conservative-keep bias is correct: any uncertainty about whether a function is dead defaults to KEEP. The cost of a false-keep is bytes; the cost of a false-remove is a runtime crash.",
+      "default_value": "uncertainty -> KEEP",
+      "confidence": "high",
+      "rationale": "Asymmetric cost. Recorded in the architecture plan as Decision D-11.",
+      "invalidation_impact": "None — this is a policy choice, not a factual claim.",
+      "rollback": "If a stricter cleanup is desired in a future pass, run a separate audit with relaxed criteria."
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "stage": "1-requirements",
+  "status": "READY_FOR_ARCHITECT",
+  "updated_utc": "2026-04-24T01:00:00Z",
+  "clarification_rounds": 1,
+  "acceptance_criteria_count": 11,
+  "context_files": 11,
+  "critical_gaps": 0,
+  "functional_requirements_count": 11,
+  "non_functional_requirements_count": 5,
+  "bugs_addressed": ["C1", "C2", "C3", "C4", "H5", "M2"],
+  "files_to_change": [
+    "marine.py",
+    "marine2.py",
+    "src/utils.py",
+    "tests/unittests.py"
+  ],
+  "quality_gate": {
+    "placeholder_scan": "PASS",
+    "vague_term_scan": "PASS",
+    "mapping_scan": "PASS",
+    "completeness_scan": "PASS"
+  },
+  "research_inputs_used": [
+    "0-research/codebase-audit.md",
+    "0-research/codemap.md",
+    "0-research/discovery-log.md",
+    "0-research/structural-index-report.md"
+  ],
+  "answers_incorporated": {
+    "1A": "bug fixes only — no new features",
+    "2A": "keep Python 3.10/conda",
+    "3A": "delete marine2.py",
+    "4A": "add start_time=time.time() at top of run()",
+    "5A": "add processes=4 param usage in generate_and_split_bed_files_for_all_positions",
+    "6B": "f-string/format fix for get_coverage_wrapper TypeError",
+    "7B": "unit+integration tests+new unit tests for changed logic",
+    "8A": "fix get_intervals off-by-one: end=contig_length",
+    "9C": "move tracemalloc.start into run() itself",
+    "10B": "unit tests for all critical/high bug fixes C1-C4+H5"
+  }
+}

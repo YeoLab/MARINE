@@ -1,0 +1,117 @@
+{
+  "schema_version": "1.0.0",
+  "pipeline_id": "forge-0951fae0",
+  "created_utc": "2026-04-24T00:00:00Z",
+  "updated_utc": "2026-04-26T23:25:00Z",
+  "current_stage": "4.5-revision",
+  "stages": {
+    "0-research": {
+      "status": "COMPLETE",
+      "completed_utc": "2026-04-24T16:52:00Z"
+    },
+    "1-requirements": {
+      "status": "COMPLETE",
+      "completed_utc": "2026-04-25T09:19:00Z"
+    },
+    "2-architect": {
+      "status": "COMPLETE",
+      "completed_utc": "2026-04-25T09:30:00Z",
+      "task_count": 9,
+      "ac_count": 11
+    },
+    "2.5-spec": {
+      "status": "COMPLETE",
+      "completed_utc": "2026-04-26T03:00:28Z",
+      "skill_version": "1.1.0",
+      "ac_count": 18,
+      "task_count": 12,
+      "human_review_halts": 1
+    },
+    "2.75-tdad": {
+      "status": "COMPLETE_WITH_NOTES",
+      "updated_utc": "2026-04-26T03:09:43Z",
+      "completed_utc": "2026-04-26T03:09:43Z",
+      "duration_seconds": 737
+    },
+    "3-implement": {
+      "status": "COMPLETE",
+      "completed_utc": "2026-04-26T23:01:46Z",
+      "task_count": 12,
+      "ac_count": 10,
+      "tests_passing": 13,
+      "functions_documented": 59,
+      "dead_code_removed": 1
+    },
+    "3.5-polish": {
+      "status": "COMPLETE",
+      "completed_utc": "2026-04-26T16:19:00Z",
+      "iterations_used": 1
+    },
+    "4-review": {
+      "status": "CHANGES_REQUIRED",
+      "completed_utc": "2026-04-26T23:25:00Z",
+      "review_round": 1,
+      "findings": {"critical": 1, "major": 3, "minor": 4},
+      "ac_passing": 10,
+      "ac_total": 10,
+      "tests_passing": 13
+    }
+  },
+  "cost": {
+    "total_input_tokens": 0,
+    "total_output_tokens": 0,
+    "total_estimated_usd": 0,
+    "per_stage": {}
+  },
+  "loop_count": {
+    "4-review->4.5-revision->4-review": 0
+  },
+  "audit_trail": [
+    {
+      "timestamp": "2026-04-26T03:09:43Z",
+      "action": "stage_complete_with_notes",
+      "stage_id": "2.75-tdad",
+      "detail": {
+        "status": "COMPLETE_WITH_NOTES",
+        "cost_usd": null,
+        "duration_s": 737
+      }
+    },
+    {
+      "timestamp": "2026-04-26T23:25:00Z",
+      "action": "stage_changes_required",
+      "stage_id": "4-review",
+      "detail": {
+        "status": "CHANGES_REQUIRED",
+        "review_round": 1,
+        "critical_findings": 1,
+        "major_findings": 3,
+        "minor_findings": 4
+      }
+    }
+  ],
+  "instrumentation": {
+    "2.75-tdad": {
+      "artifacts_present": {
+        "handoff.json": true,
+        "ac-evidence.json": false,
+        "spec-deviations.json": false,
+        "review-report.md": false,
+        "security-report.md": false,
+        "test-report.md": false
+      },
+      "notes_classification": "clean",
+      "advisory_outcomes": {
+        "analyzer": 0,
+        "inline_checks": 0,
+        "review_scorecard": 0,
+        "build_verification": 0
+      },
+      "proof_gate_warnings": 0,
+      "proof_gate_blocked": false
+    }
+  },
+  "git": {
+    "base_commit": "5cd3dafc3185db2d38b24dbce9cd8558e4e50f6c"
+  }
+}

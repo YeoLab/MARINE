@@ -1,0 +1,82 @@
+{
+  "schema_version": "1.0.0",
+  "stage_id": "2-architect",
+  "stage_name": "Architecture",
+  "stage": "2-architect",
+  "status": "COMPLETE",
+  "completed_utc": "2026-04-25T10:00:00Z",
+  "updated_utc": "2026-04-25T10:00:00Z",
+  "decision": {"gate_result": "PASS", "rationale": "12 tasks designed (9 bug-fix + 3 docstring/cleanup), 8 ADRs, 15 assumptions tracked, all quality gates PASS."},
+  "revision_note": "Extended 2026-04-25 to add tasks 10-12 (Google docstrings + unused-function audit + cleanup). Original 9 bug-fix tasks unchanged.",
+  "next_stage": "2.5-spec",
+  "downstream_consumers": ["2.5-spec", "2.75-tdad", "3.0-test-scaffold", "3-implement"],
+  "outputs": [
+    {"path": ".forge/stages/2-architect/architecture-plan.md", "description": "Full architecture plan with 12 tasks, 5 ADRs extended to 8, risk register"},
+    {"path": ".forge/stages/2-architect/implementer-prompt.md", "description": "Meta-prompt for build stage with global and per-package constraints"},
+    {"path": ".forge/stages/2-architect/exploration-report.md", "description": "Codebase exploration findings and audit results"},
+    {"path": ".forge/stages/2-architect/assumptions.json", "description": "15 tracked assumptions (A-1 through A-15)"},
+    {"path": ".forge/stages/2-architect/requirements-trace.json", "description": "FR-1..14 + NFR-1..7 mapped to tasks and ACs"},
+    {"path": ".forge/stages/2-architect/threat-model.md", "description": "STRIDE/DREAD threat model — all trust boundaries scored below threshold"},
+    {"path": ".forge/stages/2-architect/DECISIONS_SUMMARY.md", "description": "9 key decisions with rationale"},
+    {"path": ".forge/stages/2-architect/adrs/ADR-01-per-bug-sequencing.md", "description": "ADR: per-bug sequenced commits"},
+    {"path": ".forge/stages/2-architect/adrs/ADR-02-pool-processes-positional.md", "description": "ADR: positional Pool(processes)"},
+    {"path": ".forge/stages/2-architect/adrs/ADR-03-format-style-preserved.md", "description": "ADR: keep .format() style"},
+    {"path": ".forge/stages/2-architect/adrs/ADR-04-tracemalloc-placement.md", "description": "ADR: tracemalloc at top of run()"},
+    {"path": ".forge/stages/2-architect/adrs/ADR-05-static-source-tests.md", "description": "ADR: static-source tests via inspect"},
+    {"path": ".forge/stages/2-architect/adrs/ADR-06-google-docstring-style.md", "description": "ADR: Google docstring style"},
+    {"path": ".forge/stages/2-architect/adrs/ADR-07-cleanup-analysis-action-split.md", "description": "ADR: audit and removal as separate tasks"},
+    {"path": ".forge/stages/2-architect/adrs/ADR-08-conservative-keep-bias.md", "description": "ADR: uncertain functions default to KEEP"},
+    {"path": ".forge/stages/2-architect/tasks/task-01-delete-marine2.md", "description": "Task: delete marine2.py"},
+    {"path": ".forge/stages/2-architect/tasks/task-02-tests-get-intervals.md", "description": "Task: write tests for get_intervals"},
+    {"path": ".forge/stages/2-architect/tasks/task-03-test-coverage-wrapper.md", "description": "Task: write tests for get_coverage_wrapper"},
+    {"path": ".forge/stages/2-architect/tasks/task-04-fix-get-intervals.md", "description": "Task: fix get_intervals off-by-one"},
+    {"path": ".forge/stages/2-architect/tasks/task-05-fix-coverage-wrapper.md", "description": "Task: fix get_coverage_wrapper TypeError"},
+    {"path": ".forge/stages/2-architect/tasks/task-06-fix-pool-processes.md", "description": "Task: fix cores NameError"},
+    {"path": ".forge/stages/2-architect/tasks/task-07-static-source-tests.md", "description": "Task: static-source tests for pool/start_time"},
+    {"path": ".forge/stages/2-architect/tasks/task-08-fix-tracemalloc-and-start-time.md", "description": "Task: fix tracemalloc and start_time"},
+    {"path": ".forge/stages/2-architect/tasks/task-09-integration-gate.md", "description": "Task: integration test gate"},
+    {"path": ".forge/stages/2-architect/tasks/task-10-google-docstrings.md", "description": "Task: add Google docstrings to all 96 functions"},
+    {"path": ".forge/stages/2-architect/tasks/task-11-unused-function-audit.md", "description": "Task: read-only audit producing unused-functions-audit.json"},
+    {"path": ".forge/stages/2-architect/tasks/task-12-remove-confirmed-unused.md", "description": "Task: surgical removal of confirmed unused functions"}
+  ],
+  "frontend_record": null,
+  "frontend_record_skipped_reason": "archetype is data-pipeline; not a UI project",
+  "i18n_decision": null,
+  "i18n_skipped_reason": "project does not target multiple locales",
+  "selected_approach": "Package A: Approach A2 (per-bug sequenced commits); Package B: Approach B2 (docstrings -> audit -> surgical removal with human-review checkpoint)",
+  "task_count": 12,
+  "package_a_task_count": 9,
+  "package_b_task_count": 3,
+  "acceptance_criteria_count": 14,
+  "assumption_count": 15,
+  "adr_count": 8,
+  "human_review_checkpoints": [
+    {"between_tasks": "11 -> 12", "artifact": "unused-functions-audit.json", "purpose": "Reviewer confirms or downgrades each REMOVE_CANDIDATE entry before deletion."}
+  ],
+  "estimated_diff_lines": {
+    "source_modified_bug_fixes": "<=12",
+    "source_modified_docstrings": "~600-1100 (additive, all docstrings)",
+    "source_deleted_bug_fixes": "marine2.py (entire file)",
+    "source_deleted_cleanup": "TBD by audit; capped by post-review REMOVE_CANDIDATE count",
+    "test_added": "~80 (bug-fix tests) + ~30 (TestPublicAPIPreserved)"
+  },
+  "verification": {
+    "unit": "cd /tscc/projects/ps-yeolab3/bay001/codebase/MARINE/tests && python -m pytest unittests.py -v",
+    "integration": "cd /tscc/projects/ps-yeolab3/bay001/codebase/MARINE/tests && bash integration_tests_run.sh python",
+    "docstring_coverage": "cd /tscc/projects/ps-yeolab3/bay001/codebase/MARINE && python -c \"import ast; ...\" (see implementer-prompt.md Section 4)",
+    "audit_validity": "python -c \"import json; d=json.load(open('.forge/stages/2-architect/unused-functions-audit.json')); ...\""
+  },
+  "quality_gate": {
+    "structural_completeness": "PASS",
+    "ambiguity_scan": "PASS",
+    "traceability": "PASS",
+    "assumption_coverage": "PASS",
+    "frontend_record": "N/A (skipped)"
+  },
+  "warnings": [
+    "No .forge/hotspot/hotspots.json found - risk register not augmented with churn data. src/utils.py (1536 LOC, 53 functions) is the largest file in the cleanup scope; recommend extra reviewer attention there.",
+    "No .forge/stages/0-research/conflicts-resolved.md - no prior trade-off decisions to honor.",
+    "Preflight tooling (promptfoo) was being installed at stage start; verify availability before downstream stages.",
+    "Task-11 -> task-12 transition requires explicit human review of unused-functions-audit.json. The build agent must not auto-advance."
+  ]
+}

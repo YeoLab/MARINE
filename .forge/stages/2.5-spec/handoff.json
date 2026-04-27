@@ -1,0 +1,48 @@
+{
+  "stage": "2.5-spec",
+  "status": "complete",
+  "timestamp": "2026-04-26T03:00:28Z",
+  "artifacts": [
+    ".forge/stages/2.5-spec/SPEC.md",
+    ".forge/stages/2.5-spec/PLAN.md",
+    ".forge/stages/2.5-spec/TASKS.md"
+  ],
+  "summary": {
+    "ac_count": 18,
+    "ac_priority_breakdown": {
+      "P0": 12,
+      "P1": 5,
+      "P2": 1,
+      "P3": 0
+    },
+    "file_touchpoints": 19,
+    "task_count": 12,
+    "task_complexity_breakdown": {
+      "S": 9,
+      "M": 2,
+      "L": 1,
+      "XL": 0
+    },
+    "security_acs": 0,
+    "human_review_halts": 1,
+    "human_review_halt_location": "between Task-11 (audit, read-only) and Task-12 (surgical removal); enforced by AC-015"
+  },
+  "srsio_validation": {
+    "ac_count_check": "PASS (18 >= 3)",
+    "given_when_then_check": "PASS (all 18 ACs have Given/When/Then/Verification)",
+    "vague_word_check": "PASS (no unquantified vague words)",
+    "plan_table_check": "PASS",
+    "ac_coverage_in_plan_check": "PASS (18/18 ACs referenced in PLAN.md)",
+    "tasks_present_check": "PASS (12 tasks)",
+    "task_ac_linkage_check": "PASS (all 12 tasks reference at least one AC)",
+    "dag_validity_check": "PASS (no cycles; topological order: task-01 -> task-12)"
+  },
+  "key_constraints_encoded": [
+    "Mandatory human-review HALT between task-11 and task-12 (AC-015, HUMAN-REVIEW-HALT block in TASKS.md)",
+    "SPEC.md does NOT name specific functions as removal targets - audit determines at runtime per decision D-11 (uncertainty defaults to KEEP)",
+    "Task-11 is read-only (no .py modifications); task-12 only acts on post-review audit JSON",
+    "Source-code diff bounded at 12 lines for Package A (AC-016)",
+    "Package B touch set bounded to four target source files plus tests/unittests.py (AC-017)"
+  ],
+  "next_stage": "3.0-test-scaffold"
+}

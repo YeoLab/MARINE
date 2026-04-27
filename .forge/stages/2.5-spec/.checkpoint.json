@@ -1,0 +1,34 @@
+{
+  "stage": "2.5-spec",
+  "checkpoint_utc": "2026-04-26T03:00:28Z",
+  "status": "complete",
+  "phase": "post-srsio-validation",
+  "inputs_consumed": [
+    ".forge/stages/2-architect/architecture-plan.md",
+    ".forge/stages/2-architect/tasks/task-01-delete-marine2.md",
+    ".forge/stages/2-architect/tasks/task-02-tests-get-intervals.md",
+    ".forge/stages/2-architect/tasks/task-03-test-coverage-wrapper.md",
+    ".forge/stages/2-architect/tasks/task-04-fix-get-intervals.md",
+    ".forge/stages/2-architect/tasks/task-05-fix-coverage-wrapper.md",
+    ".forge/stages/2-architect/tasks/task-06-fix-pool-processes.md",
+    ".forge/stages/2-architect/tasks/task-07-static-source-tests.md",
+    ".forge/stages/2-architect/tasks/task-08-fix-tracemalloc-and-start-time.md",
+    ".forge/stages/2-architect/tasks/task-09-integration-gate.md",
+    ".forge/stages/2-architect/tasks/task-10-google-docstrings.md",
+    ".forge/stages/2-architect/tasks/task-11-unused-function-audit.md",
+    ".forge/stages/2-architect/tasks/task-12-remove-confirmed-unused.md",
+    ".forge/stages/2-architect/threat-model.md",
+    ".forge/state.json",
+    ".forge/stages/2.5-spec/pre-execution-plan.md"
+  ],
+  "outputs_produced": [
+    ".forge/stages/2.5-spec/SPEC.md",
+    ".forge/stages/2.5-spec/PLAN.md",
+    ".forge/stages/2.5-spec/TASKS.md",
+    ".forge/stages/2.5-spec/handoff.json"
+  ],
+  "srsio_gate_passed": true,
+  "human_review_halt_encoded": true,
+  "specific_removal_targets_named_in_spec": false,
+  "next_action": "present human-checkpoint summary; on confirmation update .forge/state.json to mark 2.5-spec COMPLETE and advance current_stage to 3.0-test-scaffold"
+}

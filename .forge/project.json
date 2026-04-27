@@ -1,0 +1,69 @@
+{
+  "name": "MARINE",
+  "description": "Multi-Core Algorithm for Rapid Identification of Nucleotide Edits - RNA editing detection for single-cell and bulk RNA-seq datasets",
+  "archetype": "data-pipeline",
+  "stack": {
+    "language": "Python",
+    "language_version": "3.10",
+    "framework": null,
+    "database": null,
+    "orm": null,
+    "ui_library": null,
+    "test_framework": "unittest",
+    "package_manager": "conda"
+  },
+  "verification": {
+    "test": "cd tests && python -m pytest unittests.py -v",
+    "test_alt": "cd tests && python -m unittest unittests.py",
+    "integration": "cd tests && bash integration_tests_run.sh python",
+    "lint": "bandit -r src/ marine.py || semgrep --config=auto src/",
+    "typecheck": null,
+    "build": null
+  },
+  "deploy": {},
+  "ci": {
+    "scaffolded": false,
+    "provider": "github-actions",
+    "existing_workflow": ".github/workflows/main.yml",
+    "note": "CI already configured - existing workflow runs integration tests via conda"
+  },
+  "integrations": {
+    "graphify": true,
+    "codemap": true,
+    "aidesigner": false,
+    "forge_tooling": false,
+    "beads": false
+  },
+  "code_graph": {
+    "provider": "serena",
+    "enabled": true
+  },
+  "topology": {
+    "parallel_groups": [["6-security"]],
+    "parallel_prereqs": {
+      "6-security": "5-qa"
+    }
+  },
+  "enabled_stages": [
+    "0-research",
+    "1-requirements",
+    "2-architect",
+    "2.5-spec",
+    "2.75-tdad",
+    "3.0-test-scaffold",
+    "3-implement",
+    "3.5-polish",
+    "3.75-performance",
+    "4-review",
+    "5-qa",
+    "6-security",
+    "6.5-resilience",
+    "7-docs",
+    "7.5-observability",
+    "8-release"
+  ],
+  "wiki": {
+    "enabled": true
+  },
+  "created_utc": "2026-04-24T00:00:00Z"
+}

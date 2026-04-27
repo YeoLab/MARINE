@@ -1,0 +1,41 @@
+{
+  "stage": "2.75-tdad",
+  "timestamp": "2026-04-26T03:07:00Z",
+  "base_branch": "main",
+  "changed_files": [
+    "marine.py",
+    "src/core.py",
+    "src/utils.py",
+    "src/read_process.py"
+  ],
+  "affected_tests": [
+    "tests/unittests.py"
+  ],
+  "unmatched_files": [
+    "marine.py",
+    "src/core.py"
+  ],
+  "risk_score": 0.65,
+  "risk_level": "HIGH",
+  "dep_graph": {
+    "marine.py": [],
+    "src/core.py": [],
+    "src/utils.py": [
+      "tests/unittests.py"
+    ],
+    "src/read_process.py": [
+      "tests/unittests.py"
+    ]
+  },
+  "analysis_notes": {
+    "git_diff_available": false,
+    "fallback_used": "architecture-task-list",
+    "transitive_closure_applied": true,
+    "one_hop_checked": true,
+    "integration_test_coverage": "tests/integration_tests_auto_check.py imports no source modules directly; it is an end-to-end script that reads output files and does not import marine/core/utils/read_process at import time",
+    "marine_py_coverage_note": "marine.py has no direct or one-hop test coverage. Tasks 06, 07, 08 add static-source tests to unittests.py that inspect marine.py source text via inspect.getsource — these will cover marine.py changes once task-07 and task-08 are complete.",
+    "core_py_coverage_note": "src/core.py has no direct or one-hop test coverage. It is exercised only by the integration test suite (integration_tests_run.sh) which runs marine end-to-end.",
+    "scope_factor": 1.0,
+    "blast_radius_factor": 0.5
+  }
+}

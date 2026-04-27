@@ -1,0 +1,2 @@
+tests/unittests.py
+tests/integration_tests_auto_check.py

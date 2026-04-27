@@ -1,0 +1,38 @@
+{
+  "stage": "2.75-tdad",
+  "status": "WARN",
+  "timestamp": "2026-04-26T03:07:00Z",
+  "summary": "4 source files targeted; 1 of 2 test files covers 2/4 sources; marine.py and src/core.py lack unit test coverage (WARN). Risk HIGH (0.65).",
+  "changed_files_count": 4,
+  "affected_tests_count": 1,
+  "unmatched_files_count": 2,
+  "risk_score": 0.65,
+  "risk_level": "HIGH",
+  "artifacts": [
+    ".forge/stages/2.75-tdad/impact-report.json",
+    ".forge/tdad/test-impact.txt",
+    ".forge/stages/2.75-tdad/changed-files.txt",
+    ".forge/stages/2.75-tdad/test-files.txt"
+  ],
+  "unmatched_files": [
+    "marine.py",
+    "src/core.py"
+  ],
+  "dep_graph_summary": {
+    "src/utils.py": ["tests/unittests.py"],
+    "src/read_process.py": ["tests/unittests.py"],
+    "marine.py": [],
+    "src/core.py": []
+  },
+  "downstream_guidance": {
+    "test-scaffold": "Prioritize generating unit tests for marine.py and src/core.py (both unmatched).",
+    "mutation": "Use dep_graph from impact-report.json: target tests/unittests.py for mutations in src/utils.py and src/read_process.py.",
+    "implement": "Run tests/unittests.py after each change to src/utils.py or src/read_process.py. Run integration_tests_run.sh after changes to marine.py or src/core.py. Tasks 07+08 add static-source tests for marine.py; recheck coverage after those tasks."
+  },
+  "warnings": [
+    "No git diff available — branch brian_dev has not diverged from main with committed changes. Changed files derived from architect task list.",
+    "marine.py has no unit test coverage. Tasks 07+08 will add static-source tests post-implementation.",
+    "src/core.py has no unit test coverage. Covered only by end-to-end integration suite (integration_tests_run.sh).",
+    "tests/integration_tests_auto_check.py coverage of marine.py/core.py cannot be captured by static import analysis."
+  ]
+}
