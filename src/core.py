@@ -26,7 +26,25 @@ import os, psutil
 
 
 def generate_depths(output_folder, bam_filepaths, original_bam_filepath, paired_end=False, barcode_tag=None, cores=1):
-    
+    """Generate read-depth files at edited sites using samtools depth.
+
+    Builds a combined BED of all edited positions, then runs samtools depth
+    in either single-cell (per-suffix) or bulk mode, and finally merges depth
+    columns into the final edit-info TSV.
+
+    Args:
+        output_folder: Path to the run output directory.
+        bam_filepaths: List of split BAM paths used for single-cell coverage.
+        original_bam_filepath: Path to the original unsplit BAM for bulk mode.
+        paired_end: Whether reads are paired-end (adds -s flag to samtools). Default False.
+        barcode_tag: SAM tag for cell barcodes; None triggers bulk mode. Default None.
+        cores: Number of CPU cores for parallel samtools operations. Default 1.
+
+    Returns:
+        tuple: (coverage_total_time, total_seconds_for_contig_df) where
+            coverage_total_time is wall-clock seconds for coverage computation
+            and total_seconds_for_contig_df is a single-row DataFrame recording it.
+    """
     coverage_start_time = time.perf_counter()
 
     all_depth_commands = []
@@ -96,6 +114,20 @@ def generate_depths(output_folder, bam_filepaths, original_bam_filepath, paired_
 
 def bam_processing(bam_filepath, overall_label_to_list_of_contents, output_folder, barcode_tag='CB', cores=1, number_of_expected_bams=4,
                    verbose=False):
+    """Reconfigure BAM files by splitting reads into per-barcode-suffix BAMs for coverage calculation.
+
+    Used only for single-cell and/or long-read mode. Determines which contigs need new
+    split BAMs, calls run_bam_reconfiguration, and logs timing information.
+
+    Args:
+        bam_filepath: Path to the original indexed BAM file.
+        overall_label_to_list_of_contents: Dict mapping contig labels to read content lists.
+        output_folder: Run output directory; split BAMs are placed in output_folder/split_bams/.
+        barcode_tag: SAM tag containing cell barcodes. Default 'CB'.
+        cores: Number of CPU cores for parallel BAM writing. Default 1.
+        number_of_expected_bams: Expected split BAMs per contig used to skip already-complete contigs. Default 4.
+        verbose: Enable verbose logging. Default False.
+    """
     # Only used for single-cell and/or long read reconfiguration of bams to optimize coverage calculation
     split_bams_folder = '{}/split_bams'.format(output_folder)
     make_folder(split_bams_folder)
@@ -129,7 +161,30 @@ def bam_processing(bam_filepath, overall_label_to_list_of_contents, output_folde
 
 def edit_finder(bam_filepath, output_folder, strandedness, barcode_tag="CB", barcode_whitelist=None, contigs=[],
                 verbose=False, cores=64, min_read_quality=0, min_base_quality=0, dist_from_end=0, interval_length=2000000):
-    
+    """Identify RNA edits in a BAM file across all requested contigs.
+
+    Calls run_edit_identifier to process reads in parallel per genomic interval,
+    collects per-read edit information, and prints a summary of total reads and
+    edit counts.
+
+    Args:
+        bam_filepath: Path to the input BAM file.
+        output_folder: Run output directory for edit info TSVs.
+        strandedness: Strandedness mode (0=unstranded, 1=forward, -1=reverse).
+        barcode_tag: SAM tag for cell barcodes. Default "CB".
+        barcode_whitelist: Set of allowed barcodes; None accepts all. Default None.
+        contigs: List of contig names to process; empty list processes all. Default [].
+        verbose: Enable verbose per-read logging. Default False.
+        cores: Number of CPU cores for parallel processing. Default 64.
+        min_read_quality: Minimum read mapping quality filter. Default 0.
+        min_base_quality: Minimum base quality for edit calls. Default 0.
+        dist_from_end: Minimum distance from read end to call an edit. Default 0.
+        interval_length: Genomic interval length for job parallelization. Default 2000000.
+
+    Returns:
+        tuple: (overall_label_to_list_of_contents, results, overall_time,
+            overall_total_reads, total_seconds_for_reads, counts_summary_df).
+    """
     pretty_print("Each contig is being split into subsets of length...".format(interval_length))
     
     overall_label_to_list_of_contents, results, overall_time, overall_total_reads, \
@@ -170,7 +225,30 @@ def edit_finder(bam_filepath, output_folder, strandedness, barcode_tag="CB", bar
     return overall_label_to_list_of_contents, results, total_seconds_for_reads_df, overall_total_reads, counts_summary_df
     
 def run_edit_identifier(bampath, output_folder, strandedness, barcode_tag="CB", barcode_whitelist=None, contigs=[], verbose=False, cores=64, min_read_quality=0, min_base_quality=0, dist_from_end=0, interval_length=2000000):
+    """Build and dispatch edit-finding jobs across all genomic intervals using Pool.map.
 
+    Creates per-interval edit-finding jobs, runs them in a multiprocessing spawn Pool,
+    collects per-contig read contents for downstream BAM reconfiguration, and returns
+    aggregate timing and counts DataFrames.
+
+    Args:
+        bampath: Path to the BAM file to scan for edits.
+        output_folder: Output directory; edit TSVs are written into output_folder/edit_info/.
+        strandedness: Strandedness mode passed to each worker.
+        barcode_tag: SAM tag for cell barcodes. Default "CB".
+        barcode_whitelist: Set of allowed barcodes; None accepts all. Default None.
+        contigs: List of contig names to restrict processing. Default [].
+        verbose: Enable verbose per-read logging. Default False.
+        cores: Number of worker processes in the Pool. Default 64.
+        min_read_quality: Minimum read mapping quality. Default 0.
+        min_base_quality: Minimum base quality for edit calling. Default 0.
+        dist_from_end: Minimum distance from read end. Default 0.
+        interval_length: Genomic interval length per job. Default 2000000.
+
+    Returns:
+        tuple: (overall_label_to_list_of_contents, results, total_seconds_for_reads_df,
+            overall_total_reads, counts_summary_df).
+    """
     # Make subfolder in which to information about edits
     edit_info_subfolder = '{}/edit_info'.format(output_folder)
     make_folder(edit_info_subfolder)
@@ -230,6 +308,26 @@ def run_edit_identifier(bampath, output_folder, strandedness, barcode_tag="CB", 
 
 
 def run_bam_reconfiguration(split_bams_folder, bampath, overall_label_to_list_of_contents, contigs_to_generate_bams_for, barcode_tag='CB', cores=1, number_of_expected_bams=4, verbose=False):
+    """Dispatch concat_and_write_bams_wrapper via Pool.imap_unordered to write per-contig split BAMs.
+
+    Reads the BAM header from bampath, then parallelizes concat_and_write_bams_wrapper across
+    all contigs in contigs_to_generate_bams_for. Returns total elapsed time and per-BAM timing.
+
+    Args:
+        split_bams_folder: Directory where split BAM files will be written.
+        bampath: Path to the original BAM to read header from.
+        overall_label_to_list_of_contents: Dict mapping contig labels to read content lists.
+        contigs_to_generate_bams_for: List of contig labels that require BAM generation.
+        barcode_tag: SAM tag for cell barcodes. Default 'CB'.
+        cores: Number of worker processes. Default 1.
+        number_of_expected_bams: Expected BAMs per contig for completion checking. Default 4.
+        verbose: Enable verbose logging in each worker. Default False.
+
+    Returns:
+        tuple: (total_bam_generation_time, total_seconds_for_bams) where
+            total_bam_generation_time is wall-clock seconds and total_seconds_for_bams
+            is a dict mapping BAM count to cumulative seconds.
+    """
     start_time = time.perf_counter()
 
     with pysam.AlignmentFile(bampath, "rb") as samfile:
@@ -257,11 +355,11 @@ def run_bam_reconfiguration(split_bams_folder, bampath, overall_label_to_list_of
 
 
 def run_edit_finding(barcode_tag,
-                     barcode_whitelist_file, 
-                     contigs, 
+                     barcode_whitelist_file,
+                     contigs,
                      num_per_sublist,
-                     bam_filepath, 
-                     output_folder, 
+                     bam_filepath,
+                     output_folder,
                      strandedness,
                      min_read_quality,
                      min_base_quality,
@@ -272,6 +370,33 @@ def run_edit_finding(barcode_tag,
                      logging_folder,
                      verbose=False
                     ):
+    """Orchestrate edit finding and BAM reconfiguration in batches of contigs.
+
+    For each sub-batch of contigs, calls edit_finder to identify edits and
+    optionally calls bam_processing to write split BAMs for single-cell coverage.
+    Accumulates per-contig timing and read-count summaries.
+
+    Args:
+        barcode_tag: SAM tag for cell barcodes; None triggers bulk mode.
+        barcode_whitelist_file: Path to barcode whitelist file; None accepts all barcodes.
+        contigs: List of contig names to process; empty list processes all.
+        num_per_sublist: Number of contigs per processing batch for single-cell mode.
+        bam_filepath: Path to the input BAM file.
+        output_folder: Run output directory.
+        strandedness: Strandedness mode.
+        min_read_quality: Minimum read mapping quality.
+        min_base_quality: Minimum base quality for edit calling.
+        min_dist_from_end: Minimum distance from read end.
+        interval_length: Genomic interval length for job parallelization.
+        number_of_expected_bams: Expected split BAMs per contig.
+        cores: Number of CPU cores for parallel processing.
+        logging_folder: Directory for manifest and log files.
+        verbose: Enable verbose logging. Default False.
+
+    Returns:
+        tuple: (overall_total_reads_processed, overall_counts_summary_df,
+            total_seconds_for_reads_df, total_seconds_for_bams_df).
+    """
     overall_total_reads_processed = 0
     if barcode_whitelist_file:
         barcode_whitelist = read_barcode_whitelist_file(barcode_whitelist_file)
@@ -348,6 +473,16 @@ def run_edit_finding(barcode_tag,
 
 
 def incorporate_barcode(read_as_string, contig, barcode):
+    """Rewrite the RNAME field of a SAM-format read string to encode contig and barcode.
+
+    Args:
+        read_as_string: A single tab-separated SAM alignment record as a string.
+        contig: Contig name to use as the prefix portion of the new RNAME.
+        barcode: Cell barcode to append as suffix portion of the new RNAME.
+
+    Returns:
+        str: Modified SAM record with RNAME set to '{contig}_{barcode}'.
+    """
     read_tab_separated = read_as_string.split('\t')
     contig_section = '{}_{}'.format(contig, barcode)
     read_tab_separated[2] = contig_section
@@ -355,7 +490,19 @@ def incorporate_barcode(read_as_string, contig, barcode):
     return read_as_string
 
 
-def write_bam_file(reads, bam_file_name, header_string):   
+def write_bam_file(reads, bam_file_name, header_string):
+    """Write reads to a BAM file and immediately sort and index it.
+
+    Calls write_reads_to_file to create the unsorted BAM, then sort_bam to produce
+    the coordinate-sorted version, index_bam to create the .bai index, and finally
+    rm_bam to remove the unsorted intermediate file.
+
+    Args:
+        reads: Iterable of SAM-format read strings to write.
+        bam_file_name: Output path for the (unsorted) BAM; the sorted file will be
+            named by sort_bam's return value.
+        header_string: SAM header string to prepend to the BAM.
+    """
     # Write, sort and index bam immediately
     write_reads_to_file(reads, bam_file_name, header_string)
     try:
@@ -368,7 +515,32 @@ def write_bam_file(reads, bam_file_name, header_string):
         print("Failed at indexing {}, {}".format(bam_file_name, e))
         
 
-def find_edits(bampath, contig, split_index, start, end, output_folder, barcode_tag="CB", strandedness=0, barcode_whitelist=None, verbose=False, min_read_quality=0, min_base_quality=0, dist_from_end=0):  
+def find_edits(bampath, contig, split_index, start, end, output_folder, barcode_tag="CB", strandedness=0, barcode_whitelist=None, verbose=False, min_read_quality=0, min_base_quality=0, dist_from_end=0):
+    """Scan a genomic interval in a BAM file and record RNA edits for each read.
+
+    Iterates over reads in bampath at contig:start-end, calls get_read_information
+    to extract edit details per read, writes results to a TSV and BED file, and
+    accumulates per-barcode read lists for optional BAM splitting.
+
+    Args:
+        bampath: Path to the BAM file.
+        contig: Contig name to fetch reads from.
+        split_index: Numeric index of this interval within the contig for output naming.
+        start: Start position of the genomic interval (0-based).
+        end: End position of the genomic interval (0-based).
+        output_folder: Run output directory; TSVs are written to output_folder/edit_info/.
+        barcode_tag: SAM tag for cell barcodes. Default "CB".
+        strandedness: Strandedness mode for edit filtering. Default 0.
+        barcode_whitelist: Set of allowed barcodes; None accepts all. Default None.
+        verbose: Enable verbose per-read logging. Default False.
+        min_read_quality: Minimum read mapping quality. Default 0.
+        min_base_quality: Minimum base quality for edit calling. Default 0.
+        dist_from_end: Minimum distance from read end for edit calling. Default 0.
+
+    Returns:
+        tuple: (output_file, output_bedfile, read_lists_for_barcodes, counts,
+            total_reads, time_reporting).
+    """
     edit_info_subfolder = '{}/edit_info'.format(output_folder)
         
     time_reporting = {}
@@ -478,6 +650,29 @@ dist_from_end=dist_from_end)
         
 
 def find_edits_and_split_bams(bampath, contig, split_index, start, end, output_folder, strandedness=0, barcode_tag="CB", barcode_whitelist=None, verbose=False, min_read_quality=0, min_base_quality=0, dist_from_end=0):
+    """Call find_edits and return its barcode-to-reads mapping and statistics.
+
+    Thin wrapper around find_edits that unpacks the relevant return values for
+    use by find_edits_and_split_bams_wrapper.
+
+    Args:
+        bampath: Path to the BAM file.
+        contig: Contig name to process.
+        split_index: Interval index for output naming.
+        start: Interval start position (0-based).
+        end: Interval end position (0-based).
+        output_folder: Run output directory.
+        strandedness: Strandedness mode. Default 0.
+        barcode_tag: SAM tag for cell barcodes. Default "CB".
+        barcode_whitelist: Set of allowed barcodes; None accepts all. Default None.
+        verbose: Enable verbose logging. Default False.
+        min_read_quality: Minimum read mapping quality. Default 0.
+        min_base_quality: Minimum base quality for edit calling. Default 0.
+        dist_from_end: Minimum distance from read end. Default 0.
+
+    Returns:
+        tuple: (barcode_to_concatted_reads, total_reads, counts, time_reporting).
+    """
     barcode_to_concatted_reads, total_reads, counts, time_reporting = find_edits(bampath, contig, split_index,
                                                                          start, end, output_folder, barcode_tag=barcode_tag,
                                                                                  strandedness=strandedness,
@@ -494,6 +689,22 @@ import random
 
 
 def find_edits_and_split_bams_wrapper(parameters):
+    """Worker function for Pool.map; unpacks a 13-tuple of edit-finding parameters and calls find_edits_and_split_bams.
+
+    Dispatched by run_edit_identifier via multiprocessing.Pool.map. Unpacks the
+    single tuple argument, delegates to find_edits_and_split_bams, and returns a
+    dict summarizing barcode-to-read mappings, total reads, counts, and timing.
+
+    Args:
+        parameters: 13-tuple of (bampath, contig, split_index, start, end,
+            output_folder, strandedness, barcode_tag, barcode_whitelist, verbose,
+            min_read_quality, min_base_quality, dist_from_end).
+
+    Returns:
+        dict: {'label': str, 'barcode_to_concatted_reads': dict,
+            'total_reads': int, 'counts': dict, 'time': float,
+            'counts_df': pd.DataFrame} or a dict with 'error' key on failure.
+    """
     try:
         start_time = time.perf_counter()
         bampath, contig, split_index, start, end, output_folder, strandedness, barcode_tag, barcode_whitelist, verbose, min_read_quality, min_base_quality, dist_from_end = parameters
@@ -551,13 +762,32 @@ def find_edits_and_split_bams_wrapper(parameters):
     
     
     
-def run_coverage_calculator(edit_info_grouped_per_contig_combined, 
-                            output_folder, 
+def run_coverage_calculator(edit_info_grouped_per_contig_combined,
+                            output_folder,
                             barcode_tag='CB',
-                            paired_end=False, 
+                            paired_end=False,
                             verbose=False,
                             processes=16
                            ):
+    """Calculate per-barcode coverage at edited sites across all contigs via Pool.imap_unordered.
+
+    Builds coverage job parameters, dispatches get_coverage_wrapper to a spawn Pool,
+    and collects per-contig coverage result files.
+
+    Args:
+        edit_info_grouped_per_contig_combined: Dict mapping contig names to combined
+            edit-info DataFrames.
+        output_folder: Run output directory for coverage TSV files.
+        barcode_tag: SAM tag for cell barcodes. Default 'CB'.
+        paired_end: Whether reads are paired-end. Default False.
+        verbose: Enable verbose logging in workers. Default False.
+        processes: Number of worker processes. Default 16.
+
+    Returns:
+        tuple: (results, total_time, total_seconds_for_contig) where results is a list
+            of coverage output filenames, total_time is elapsed wall-clock seconds, and
+            total_seconds_for_contig is a dict mapping contig count to cumulative seconds.
+    """
     coverage_counting_job_params = get_job_params_for_coverage_for_edits_in_contig(
         edit_info_grouped_per_contig_combined, 
         output_folder,
@@ -592,8 +822,21 @@ def run_coverage_calculator(edit_info_grouped_per_contig_combined,
 
 def get_job_params_for_coverage_for_edits_in_contig(edit_info_grouped_per_contig_combined, output_folder,
                                                     barcode_tag='CB', paired_end=False, verbose=False):
+    """Build the list of parameter tuples consumed by get_coverage_wrapper for each contig.
+
+    Args:
+        edit_info_grouped_per_contig_combined: Dict mapping contig names to edit-info DataFrames.
+        output_folder: Run output directory passed through to each worker.
+        barcode_tag: SAM tag for cell barcodes. Default 'CB'.
+        paired_end: Whether reads are paired-end. Default False.
+        verbose: Enable verbose logging. Default False.
+
+    Returns:
+        list: Each element is a 6-element list [edit_info, contig, output_folder,
+            barcode_tag, paired_end, verbose] ready for Pool.imap_unordered dispatch.
+    """
     job_params = []
-    
+
     for contig, edit_info in edit_info_grouped_per_contig_combined.items():
                     
         job_params.append([edit_info, contig, output_folder, barcode_tag, paired_end, verbose])  
@@ -602,7 +845,23 @@ def get_job_params_for_coverage_for_edits_in_contig(edit_info_grouped_per_contig
 
     
 def gather_edit_information_across_subcontigs(output_folder, barcode_tag='CB', number_of_expected_bams=4):
-    
+    """Aggregate per-interval edit-info TSVs into per-contig (and per-suffix for SC) Polars DataFrames.
+
+    Reads every edit_info TSV written by find_edits, groups them by contig and (for single-cell
+    data) by barcode suffix, concatenates within each group, and returns a dict mapping
+    contig-suffix keys to combined DataFrames.
+
+    Args:
+        output_folder: Run output directory containing edit_info/*.tsv files.
+        barcode_tag: SAM tag used for grouping; 'CB', 'IS', or 'IB' trigger per-suffix
+            grouping; any other value is treated as bulk. Default 'CB'.
+        number_of_expected_bams: Not used currently; reserved for future per-contig
+            completion checks. Default 4.
+
+    Returns:
+        defaultdict: Maps contig (or contig_suffix) keys to pl.DataFrame of combined
+            edit information.
+    """
     splits = [i.split("/")[-1].split('_edit')[0] for i in sorted(glob('{}/edit_info/*'.format(output_folder)))]
 
     all_edit_info_for_barcodes = []
@@ -658,6 +917,19 @@ def gather_edit_information_across_subcontigs(output_folder, barcode_tag='CB', n
 
 
 def add_site_id(all_edit_info):
+    """Append a composite site_id column to the edit-info DataFrame.
+
+    Concatenates barcode, contig, position, ref, alt, and strand with
+    underscore separators to form a unique identifier per editing site.
+
+    Args:
+        all_edit_info: Polars DataFrame containing per-read edit records.
+            Must have columns barcode, contig, position, ref, alt, strand.
+
+    Returns:
+        Polars DataFrame with an additional site_id string column, or the
+        original empty DataFrame if no rows are present.
+    """
     if len(all_edit_info) == 0:
         return all_edit_info
 
@@ -677,6 +949,18 @@ def add_site_id(all_edit_info):
 
 
 def get_count_and_coverage_per_site(all_edit_info, skip_coverage=False):
+    """Compute per-site read counts and maximum coverage from edit records.
+
+    Args:
+        all_edit_info: Polars DataFrame with a site_id column and, when
+            skip_coverage is False, a coverage column.
+        skip_coverage: When True, return only read counts without joining
+            coverage data. Default False.
+
+    Returns:
+        Polars DataFrame with columns site_id and count, plus coverage
+        (max per site) when skip_coverage is False.
+    """
     num_edits_df = all_edit_info.group_by("site_id").count()
 
     if not skip_coverage:
@@ -688,6 +972,22 @@ def get_count_and_coverage_per_site(all_edit_info, skip_coverage=False):
 
 
 def generate_site_level_information(all_edit_info, skip_coverage=False):
+    """Collapse per-read edit records into one row per unique editing site.
+
+    Assigns site IDs, deduplicates identifying columns, and joins per-site
+    read counts and maximum coverage. Adds a ref>alt conversion label column.
+
+    Args:
+        all_edit_info: Polars DataFrame of per-read edit records with columns
+            barcode, contig, position, ref, alt, strand, and (when
+            skip_coverage is False) coverage.
+        skip_coverage: When True, omit the coverage join step. Default False.
+
+    Returns:
+        Polars DataFrame with one row per unique site containing site_id,
+        barcode, contig, position, ref, alt, strand, count, coverage (if
+        not skipped), and a conversion column (e.g. "A>G").
+    """
     number_of_edits = len(all_edit_info)
     
     all_edit_info = add_site_id(all_edit_info)

@@ -58,6 +58,15 @@ def incorporate_insertions_and_deletions(aligned_sequence, cigar_tuples, inserti
 
 
 def get_hamming_distance(str1, str2):
+    """Compute the Hamming distance between two equal-length strings.
+
+    Args:
+        str1: First string.
+        str2: Second string; must be the same length as str1.
+
+    Returns:
+        Integer count of positions where str1 and str2 differ.
+    """
     assert(len(str1) == len(str2))
     distance = 0
     for i, v1 in enumerate(str1):
@@ -69,6 +78,18 @@ def get_hamming_distance(str1, str2):
     
     
 def has_edits(read):
+    """Return True if the read's MD tag indicates any base substitutions or deletions.
+
+    Checks for the presence of any nucleotide letter in the MD tag. Always
+    returns True for reads containing deletions, because the MD tag records
+    the deleted reference bases as nucleotide characters.
+
+    Args:
+        read: pysam.AlignedSegment with an MD tag.
+
+    Returns:
+        True if the MD tag contains A, C, G, or T; None otherwise.
+    """
     # Are there any replacements? This will always return true if a read has any deletions,
     # as the deletions will also be followed by ACT or G...
     try:
@@ -81,6 +102,15 @@ def has_edits(read):
         return True
 
 def get_total_coverage_for_contig_at_position(r, coverage_dict):
+    """Look up the coverage depth for a single edit record from a pre-built coverage dict.
+
+    Args:
+        r: Named tuple or object with position, contig, and barcode attributes.
+        coverage_dict: Nested dict mapping contig -> barcode -> position -> coverage depth.
+
+    Returns:
+        Integer coverage depth at the edit's position.
+    """
     position = r.position
     contig = r.contig
     barcode = r.barcode
@@ -88,6 +118,14 @@ def get_total_coverage_for_contig_at_position(r, coverage_dict):
 
 
 def print_read_info(read):
+    """Print diagnostic alignment fields for a single read to stdout.
+
+    Outputs MD tag, CIGAR string, orientation flags, read pairing flags,
+    and the full pysam string representation. Used for verbose debugging only.
+
+    Args:
+        read: pysam.AlignedSegment to inspect.
+    """
     md_tag = read.get_tag('MD')
     read_id = read.query_name
     cigar_string = read.cigarstring
@@ -107,8 +145,30 @@ def print_read_info(read):
 
     print(str(read))
     
-def get_read_information(read, contig, barcode_tag='CB', verbose=False, strandedness=0, 
+def get_read_information(read, contig, barcode_tag='CB', verbose=False, strandedness=0,
                          min_read_quality=0, min_base_quality=0, dist_from_end=0):
+    """Extract edit records from a single aligned read after applying all quality filters.
+
+    Determines strand orientation, validates the read against quality and
+    filter criteria, and delegates to get_edit_information_wrapper for the
+    per-position edit extraction. Returns a reason code on early exit.
+
+    Args:
+        read: pysam.AlignedSegment to process.
+        contig: Contig name for position labeling.
+        barcode_tag: SAM tag containing the cell barcode. Default 'CB'.
+        verbose: Enable verbose per-position logging. Default False.
+        strandedness: Strand protocol (0=unstranded, 1=F1R2, 2=F2R1). Default 0.
+        min_read_quality: Minimum MAPQ to accept a read. Default 0.
+        min_base_quality: Minimum base quality to call an edit. Default 0.
+        dist_from_end: Minimum distance from either read end to call an edit. Default 0.
+
+    Returns:
+        tuple: (reason_code, list_of_rows, num_edits_of_each_type).
+            reason_code is None on success or a string code on early exit.
+            list_of_rows is a list of per-edit rows (empty on early exit).
+            num_edits_of_each_type is a defaultdict of ref>alt counts.
+    """
     if barcode_tag is None:
         read_barcode = 'no_barcode'
     elif read.has_tag(barcode_tag):
@@ -318,9 +378,17 @@ def incorporate_replaced_pos_info(aligned_seq, positions_replaced, positions_del
     Return the aligned sequence string, with specified positions indicated as upper case
     and others as lower case. Also returns the bases at these positions themselves.
     """
-    def upper(x): return x.upper()
-    def lower(x): return x.lower()
-    def nothing(x): return str(x)
+    def upper(x):
+        """Return x converted to uppercase."""
+        return x.upper()
+
+    def lower(x):
+        """Return x converted to lowercase."""
+        return x.lower()
+
+    def nothing(x):
+        """Return x as a string unchanged."""
+        return str(x)
     
     if not qualities:
         differences_function = upper
@@ -347,10 +415,31 @@ def incorporate_replaced_pos_info(aligned_seq, positions_replaced, positions_del
     return ''.join(indicated_aligned_seq), bases_at_pos
 
 def find(s, ch):
+    """Return a list of all indices where character ch appears in string s.
+
+    Args:
+        s: String to search.
+        ch: Single character to find.
+
+    Returns:
+        List of integer indices (may be empty).
+    """
     return [i for i, ltr in enumerate(s) if ltr == ch]
 
 
 def remove_softclipped_bases(cigar_tuples, aligned_sequence):
+    """Strip soft-clipped bases from both ends of a sequence and its CIGAR tuples.
+
+    Args:
+        cigar_tuples: List of (operation, length) CIGAR tuples. Operation 4
+            is soft-clip (pysam convention).
+        aligned_sequence: Read sequence string (or quality array) to trim.
+
+    Returns:
+        tuple: (cropped_sequence, cropped_tuples) with soft-clip entries
+            removed from the CIGAR list and the corresponding bases removed
+            from the sequence string.
+    """
     had_front_clipped = 0
     had_back_clipped = 0
     
@@ -373,7 +462,26 @@ def remove_softclipped_bases(cigar_tuples, aligned_sequence):
     return cropped_sequence, cropped_tuples  
 
 
-def get_edit_information(md_tag, cigar_tuples, aligned_seq, reference_seq, query_qualities, hamming_check=False, verbose=False): 
+def get_edit_information(md_tag, cigar_tuples, aligned_seq, reference_seq, query_qualities, hamming_check=False, verbose=False):
+    """Extract alt bases, ref bases, qualities, and 1-based positions for all edits in a read.
+
+    Clips soft-clipped bases, resolves insertions and deletions using the
+    CIGAR string, identifies substituted positions from the MD tag, and
+    returns per-edit base and quality information.
+
+    Args:
+        md_tag: MD tag string from the BAM record.
+        cigar_tuples: List of (operation, length) CIGAR tuples.
+        aligned_seq: Read sequence after orientation correction.
+        reference_seq: Reference sequence for the aligned region (lowercase).
+        query_qualities: Per-base quality array or None.
+        hamming_check: When True, assert Hamming distance equals edit count. Default False.
+        verbose: Enable step-by-step diagnostic printing. Default False.
+
+    Returns:
+        tuple: (alt_bases, ref_bases, qualities, global_positions_replaced_1based)
+            where each list has one entry per detected edit.
+    """
     if verbose:
             print('CIGAR tuples before clipping (if needed):\n', cigar_tuples)
             print('Aligned sequence before clipping (if needed):\n', aligned_seq)
@@ -467,6 +575,20 @@ def get_edit_information(md_tag, cigar_tuples, aligned_seq, reference_seq, query
     
     
 def get_edit_information_wrapper(read, hamming_check=False, verbose=False):
+    """Extract edit information from a pysam AlignedSegment.
+
+    Retrieves the MD tag, CIGAR tuples, forward sequence, quality scores,
+    and reference sequence from the read object and delegates to
+    get_edit_information for the actual edit extraction.
+
+    Args:
+        read: pysam.AlignedSegment to process.
+        hamming_check: When True, assert Hamming distance equals edit count. Default False.
+        verbose: Enable diagnostic logging. Default False.
+
+    Returns:
+        tuple: (alt_bases, ref_bases, qualities, global_positions_replaced_1based).
+    """
     md_tag = read.get_tag('MD')
     cigarstring = read.cigarstring
        

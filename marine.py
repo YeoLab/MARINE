@@ -37,6 +37,17 @@ from annotate import annotate_sites, get_strand_specific_conversion
 
 
 def get_unique_barcodes(bam_path):
+    """Extract unique cell barcodes from a BAM file using samtools and awk.
+
+    Args:
+        bam_path: Path to the BAM file to extract CB tags from.
+
+    Returns:
+        list: Sorted list of unique barcode strings found in the BAM file.
+
+    Raises:
+        RuntimeError: When the samtools/awk command returns a non-zero exit code.
+    """
     # Use samtools to extract CB tags and get unique barcodes
     command = (
         f"samtools view {bam_path} | "  # View the BAM file
@@ -55,13 +66,14 @@ def get_unique_barcodes(bam_path):
 
 
 def get_unique_barcodes_for_reads_in_bamfile(args):
-    """
-    Worker function to process a BAM file for a specific chromosome.
+    """Worker function for Pool.map; unpacks a 7-tuple and returns unique barcodes for a BAM/chromosome.
+
     Args:
-        args (tuple): (chrom, prefix, suffix, bam_filepath, unique_positions)
+        args: 7-tuple of (chrom, prefix, suffix, bam_filepath, unique_positions,
+            output_folder, output_suffix).
 
     Returns:
-        tuple: (unique_barcodes, unique_positions)
+        list: Sorted list of unique barcode strings found in bam_filepath.
     """
     chrom, prefix, suffix, bam_filepath, unique_positions, output_folder, output_suffix = args
     
@@ -157,13 +169,11 @@ def prepare_combinations_for_split(df, bam_filepaths, output_folder, output_suff
 
 
 def process_combination_for_split(args):
-    """
-    Processes a single combination of chromosome, prefix, suffix, positions, and barcodes 
-    to write split BED files.
+    """Worker function for Pool.map; unpacks a 7-tuple and writes split BED files for one combination.
 
     Args:
-        args (tuple): Contains chromosome, prefix, suffix, positions, barcodes, 
-                      output folder, and output suffix.
+        args: 7-tuple of (chrom, prefix, suffix, unique_barcodes, unique_positions,
+            output_folder, output_suffix).
     """
     chrom, prefix, suffix, unique_barcodes, unique_positions, output_folder, output_suffix = args
     # Output file path
@@ -180,15 +190,18 @@ def process_combination_for_split(args):
     
 
 def filter_sites_using_tabulation_bed(df, tabulation_bed):
-    """Filters edit positions based on a tabulation bed file.
+    """Filter edit positions to those overlapping a tabulation BED file.
 
-    Arguments:
-        * df - dataframe of final sites 
-        * tabulation_bed - file path to bed file containing all sites where coverage calculation is desired
+    Args:
+        df: DataFrame of final sites with 'contig' and 'position' columns.
+        tabulation_bed: File path to BED file containing all sites where coverage
+            calculation is desired.
+
     Returns:
-        * tabulation_bed_df - represents all sites in the tabulation bed file
-        * tabulation_edits_df - represents all sites in the tabulation bed file that have at least one edit 
-        * unique_tabulation_bed_sites - represents deduplicated site list based on tabulation bed locations
+        tuple: (tabulation_bed_df, tabulation_edits_df, unique_tabulation_bed_sites)
+            where tabulation_bed_df is all sites in the BED file,
+            tabulation_edits_df is BED sites that have at least one edit,
+            and unique_tabulation_bed_sites is a deduplicated array of contig_position strings.
     """
     df['contig_position'] = df['contig'].astype(str) + '_' + df['position'].astype(str)
     
@@ -212,15 +225,14 @@ def filter_sites_using_tabulation_bed(df, tabulation_bed):
 
 
 def generate_and_split_bed_files_for_all_positions(output_folder, bam_filepaths, tabulation_bed=None, processes=4, output_suffix="all_cells"):
-    """
-    Generates combined BED files for all edit sites and splits them into suffix-specific files.
+    """Generate combined BED files for all edit sites and split them into suffix-specific files.
 
     Args:
-        output_folder (str): Path to the output folder.
-        bam_filepaths (list): List of BAM filepaths for suffix extraction.
-        strand_conversion (str): Strand conversion type (e.g., 'A>G').
-        processes (int): Number of multiprocessing workers.
-        output_suffix (str): Suffix for output files.
+        output_folder: Path to the output folder containing final_filtered_site_info.tsv.
+        bam_filepaths: List of BAM filepaths used to extract suffix pairs.
+        tabulation_bed: Optional BED file path to filter sites before splitting. Default None.
+        processes: Number of multiprocessing workers. Default 4.
+        output_suffix: Suffix used in output directory and file naming. Default "all_cells".
     """
     input_file = f"{output_folder}/final_filtered_site_info.tsv"
     df = pd.read_csv(input_file, sep="\t")
@@ -276,7 +288,7 @@ def generate_and_split_bed_files_for_all_positions(output_folder, bam_filepaths,
             raise  # Properly re-raise the exception
             
     # Run the processing with multiprocessing
-    with Pool(processes=cores) as pool:
+    with Pool(processes) as pool:
         pool.map(process_combination_for_split, combinations)
 
     print(f"\nAll split BED files generated in {output_folder}/combined_{output_suffix}_split_by_suffix\n")
@@ -288,7 +300,43 @@ def run(bam_filepath, annotation_bedfile_path, output_folder, contigs=[], strand
         skip_coverage=False, interval_length=2000000,
         all_cells_coverage=False, tabulation_bed=None
        ):
-        
+    """Run the full MARINE RNA-editing detection pipeline from BAM to filtered edit sites.
+
+    Orchestrates all pipeline stages: edit identification, BAM reconfiguration, coverage
+    calculation, site-level annotation, BED/SAILOR/bedgraph output, and optional
+    all-cells coverage pivot. Writes results to output_folder.
+
+    Args:
+        bam_filepath: Path to the input BAM file.
+        annotation_bedfile_path: Path to the annotation BED file for strand information.
+        output_folder: Directory where all output files will be written.
+        contigs: List of contig names to process. Empty list processes all contigs.
+        strandedness: Whether to apply strand-specific filtering. Default True.
+        barcode_tag: SAM tag containing cell barcodes. Default "CB".
+        paired_end: Whether reads are paired-end. Default False.
+        barcode_whitelist_file: Path to barcode whitelist file. Default None.
+        verbose: Enable verbose logging. Default False.
+        coverage_only: Skip edit finding and only calculate coverage. Default False.
+        filtering_only: Only apply filters to existing edit info. Default False.
+        annotation_only: Only run annotation step. Default False.
+        bedgraphs_list: List of strand conversions for bedgraph output. Default [].
+        sailor_list: List of strand conversions for SAILOR output. Default [].
+        min_base_quality: Minimum base quality score to consider an edit. Default 15.
+        min_read_quality: Minimum read mapping quality. Default 0.
+        min_dist_from_end: Minimum distance from read end to call an edit. Default 10.
+        max_edits_per_read: Maximum allowed edits per read; None disables filter. Default None.
+        cores: Number of CPU cores for multiprocessing. Default 64.
+        number_of_expected_bams: Expected number of split BAMs per contig. Default 4.
+        keep_intermediate_files: Retain intermediate files after completion. Default False.
+        num_per_sublist: Number of contigs processed per sublist batch. Default 6.
+        skip_coverage: Skip coverage calculation step. Default False.
+        interval_length: Length of genomic intervals for parallelization. Default 2000000.
+        all_cells_coverage: Calculate coverage across all cells. Default False.
+        tabulation_bed: BED file specifying sites for tabulation coverage. Default None.
+    """
+    start_time = time.time()
+    tracemalloc.start()
+
     logging_folder = "{}/metadata".format(output_folder)
 
     with open('{}/manifest.txt'.format(logging_folder), 'a+') as f:
@@ -487,6 +535,14 @@ def run(bam_filepath, annotation_bedfile_path, output_folder, contigs=[], strand
     pretty_print("Done!", style="+")
 
 def check_samtools():
+    """Verify that samtools is installed and accessible on the system PATH.
+
+    Exits the process with code 1 if samtools is missing or returns a non-zero
+    exit code when invoked, so the caller does not need to handle a return value.
+
+    Raises:
+        SystemExit: When samtools is not found in PATH or returns a non-zero exit code.
+    """
     try:
         # Run 'samtools --version' to check if samtools is available
         subprocess.run(["samtools", "--version"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -649,10 +705,7 @@ if __name__ == '__main__':
     else:
         contigs = contigs.split(",")
 
-    start_time = time.time()
-    tracemalloc.start()
-    
-    run(bam_filepath, 
+    run(bam_filepath,
         annotation_bedfile_path,
         output_folder, 
         contigs=contigs,

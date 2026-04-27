@@ -24,6 +24,7 @@ import scipy.sparse as sp
 CB_N = 1
 
 def print_marine_logo():
+    """Print the MARINE ASCII art logo and tool name banner to stdout."""
     logo_lines = [
     "\n",
     "::::    ::::      :::     :::::::::  ::::::::::: ::::    ::: :::::::::: ",
@@ -122,6 +123,14 @@ suffixes = {
 
 
 def generate_bedgraphs(final_site_level_information_df, conversions_list, output_folder):
+    """Write per-conversion bedGraph files to output_folder/bedgraphs/.
+
+    Args:
+        final_site_level_information_df: Pandas DataFrame with site-level edit
+            information including strand_conversion, position, count, and coverage.
+        conversions_list: List of two-character conversion strings (e.g. ['AG', 'TC']).
+        output_folder: Root output directory; bedgraphs/ subdirectory is created.
+    """
     bedgraph_folder = '{}/bedgraphs'.format(output_folder)
     make_folder(bedgraph_folder)
     
@@ -138,6 +147,19 @@ def generate_bedgraphs(final_site_level_information_df, conversions_list, output
 
 
 def convert_sites_to_sailor(final_site_level_information_df, sailor_list, output_folder, skip_coverage):
+    """Write SAILOR-formatted BED files for each requested conversion to output_folder.
+
+    Produces one BED file per conversion with columns: contig, start, end,
+    score, edit_count,coverage combo, and strand. Files are named
+    sailor_style_sites_<ref>-<alt>.bed. Used as input for FLARE downstream.
+
+    Args:
+        final_site_level_information_df: Pandas DataFrame with strand_conversion
+            and site-level columns.
+        sailor_list: List of two-character conversion strings (e.g. ['AG']).
+        output_folder: Directory for output BED files.
+        skip_coverage: When True, set coverage to -1 in SAILOR output.
+    """
     # Output SAILOR-formatted file for use in FLARE downstream
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # 1       629275  629276  0.966040688     2,30    +
@@ -207,6 +229,20 @@ def split_bed_file(input_bed_file, output_folder, bam_filepaths, output_suffix='
             handle.close()
             
 def get_contigs_that_need_bams_written(expected_contigs, split_bams_folder, barcode_tag='CB', number_of_expected_bams=4):
+    """Return the subset of contigs that do not yet have all expected split BAMs indexed.
+
+    Scans split_bams_folder for existing .bai index files and compares per-contig
+    counts against the expected number of BAMs per contig.
+
+    Args:
+        expected_contigs: Iterable of contig names that should have BAMs written.
+        split_bams_folder: Path to the directory containing per-contig split BAM subdirectories.
+        barcode_tag: SAM tag used for barcodes; 'CB' triggers 4^CB_N expected BAMs. Default 'CB'.
+        number_of_expected_bams: Expected BAMs per contig for non-CB barcode tags. Default 4.
+
+    Returns:
+        List of contig names that are missing one or more expected BAMs.
+    """
     bam_indices_written = [f.split('/')[-1].split('.bam')[0] for f in glob('{}/*/*.sorted.bam.bai'.format(split_bams_folder))]
 
     subsets_per_contig = defaultdict(lambda:0)
@@ -230,6 +266,15 @@ def get_contigs_that_need_bams_written(expected_contigs, split_bams_folder, barc
 
 
 def get_broken_up_contigs(contigs, num_per_sublist):
+    """Partition a contig list into fixed-size sublists for batched processing.
+
+    Args:
+        contigs: Ordered list of contig names.
+        num_per_sublist: Maximum number of contigs per sublist batch.
+
+    Returns:
+        List of sublists, each containing at most num_per_sublist contig names.
+    """
     broken_up_contigs = []
                 
     i_options = range((math.ceil(len(contigs)/num_per_sublist)) + 1)
@@ -310,7 +355,28 @@ def pivot_edits_to_sparse(df, output_folder, overall_barcodes_list, overall_posi
         print(f"\t\tSaved sparse matrix ({adata.shape}) for {strand_conversion} to {output_file_name}")
 
 def make_edit_finding_jobs(bampath, output_folder, strandedness, barcode_tag="CB", barcode_whitelist=None, contigs=[], verbose=False, min_read_quality=0, min_base_quality=0, dist_from_end=0, interval_length=2000000):
-    
+    """Build the list of per-interval job parameter tuples for edit finding.
+
+    Opens the BAM header to get contig lengths, splits each contig into
+    fixed-size intervals, and packages all parameters into a list suitable
+    for Pool.imap_unordered dispatch.
+
+    Args:
+        bampath: Path to the indexed input BAM file.
+        output_folder: Run output directory.
+        strandedness: Strand protocol integer (0, 1, or 2).
+        barcode_tag: SAM tag for cell barcodes. Default 'CB'.
+        barcode_whitelist: Set of allowed barcodes; None accepts all. Default None.
+        contigs: Restrict processing to these contig names; empty list uses all. Default [].
+        verbose: Enable verbose per-read logging. Default False.
+        min_read_quality: Minimum MAPQ filter. Default 0.
+        min_base_quality: Minimum base quality filter. Default 0.
+        dist_from_end: Minimum distance from read end to call an edit. Default 0.
+        interval_length: Genomic interval size in base pairs. Default 2000000.
+
+    Returns:
+        List of parameter lists, one per genomic interval job.
+    """
     jobs = []
     
     samfile = pysam.AlignmentFile(bampath, "rb")
@@ -368,12 +434,31 @@ def get_contig_lengths_dict(bam_handle):
     return contig_lengths
 
 def read_barcode_whitelist_file(barcode_whitelist_file):
+    """Load a single-column barcode whitelist CSV into a set.
+
+    Args:
+        barcode_whitelist_file: Path to a CSV file with one barcode per line
+            and no header.
+
+    Returns:
+        Set of barcode strings from the file.
+    """
     barcode_whitelist = set(pd.read_csv(barcode_whitelist_file, names=['barcodes']).barcodes.tolist())
     
     pretty_print("Barcodes in whitelist: {}".format(len(barcode_whitelist)))
     return barcode_whitelist
 
 def print_all_cells_coverage_warning(all_cells_coverage, tabulation_bed):
+    """Print a resource warning when all-cells coverage mode is active.
+
+    When all_cells_coverage is True, prints a warning about computational
+    cost and validates that tabulation_bed exists if provided.
+
+    Args:
+        all_cells_coverage: Boolean flag indicating all-cells coverage mode.
+        tabulation_bed: Optional path to a BED file limiting tabulation sites.
+            If provided and missing, exits with code 1.
+    """
     if all_cells_coverage:
         print("\n\nWill tabulate coverage across all cells... WARNING this can be extremely resource-consuming if there are a lot of cells and a lot of sites. Consider first filtering sites and then using the --tabulation_bed argument to specify the specific locations you would like tabulated across all cells.\n\n")
         if tabulation_bed:
@@ -384,6 +469,21 @@ def print_all_cells_coverage_warning(all_cells_coverage, tabulation_bed):
                 sys.exit(1)
 
 def convert_conversions_argument(conversions, barcode_tag, file_type=None):
+    """Parse and validate the comma-separated conversions CLI argument.
+
+    Normalizes inosine shorthand (I -> G) and validates each conversion against
+    the set of supported two-letter combinations. Exits with error code 1 if
+    conversions are requested for single-cell (barcode) runs.
+
+    Args:
+        conversions: Comma-separated conversion string (e.g. "AG,TC") or None.
+        barcode_tag: BAM tag used for barcodes; 'CB' or 'IB' prevents bedgraph output.
+        file_type: Human-readable file type name for error messages. Default None.
+
+    Returns:
+        List of validated uppercase two-letter conversion strings, or empty list
+        when conversions is None.
+    """
     # Convert bedgraphs argument into list of conversions
     if not conversions is None:
         if barcode_tag in ['CB', 'IB']:
@@ -398,6 +498,15 @@ def convert_conversions_argument(conversions, barcode_tag, file_type=None):
     return conversions_list 
     
 def pretty_print(contents, style=''):
+    """Write contents to stdout with optional framing lines.
+
+    Recursively handles lists. When style is provided (e.g. '=' or '-'),
+    prints a line of that character before and after the content.
+
+    Args:
+        contents: String or list of strings to print.
+        style: Single character used to build framing lines. Default '' (no frame).
+    """
     if type(contents) == list:
         for item in contents:
             pretty_print(item)
@@ -437,7 +546,7 @@ def get_intervals(contig, contig_lengths_dict, interval_length=2000000):
     intervals = []
     while start < contig_length:
         if end > contig_length:
-            end == contig_length
+            end = contig_length
 
         interval = [start, end]
         intervals.append(interval)
@@ -451,6 +560,14 @@ def get_intervals(contig, contig_lengths_dict, interval_length=2000000):
 
 
 def index_bam(barcode_bam_file_path):
+    """Create or refresh the .bai index for a BAM file using pysam.
+
+    Skips indexing if a fresh .bai file already exists. Re-indexes if the
+    index is older than the BAM file.
+
+    Args:
+        barcode_bam_file_path: Path to the sorted BAM file to index.
+    """
     index_path = '{}.bai'.format(barcode_bam_file_path)
     if not os.path.exists(index_path):
         pysam.index(barcode_bam_file_path)
@@ -460,14 +577,34 @@ def index_bam(barcode_bam_file_path):
             
             
 def write_rows_to_info_file(list_of_rows, f):
+    """Write a list of tab-separated field lists as lines to an open file handle.
+
+    Args:
+        list_of_rows: List of lists; each inner list is joined with tabs.
+        f: Open writable file handle.
+    """
     for info_list in list_of_rows:
         info_line = '\t'.join(info_list) + '\n'
         f.write(info_line)
         
 def write_header_to_edit_info(f):
+    """Write the tab-separated column header for an edit_info TSV file.
+
+    Args:
+        f: Open writable file handle for an edit_info output file.
+    """
     f.write('barcode\tcontig\tcontig_position\tposition\tref\talt\tread_id\tstrand\n')
     
 def write_read_to_bam_file(read, bam_handles_for_barcodes, barcode_bam_file_path, samfile_template):
+    """Write a single read to the appropriate per-barcode BAM file, opening it if needed.
+
+    Args:
+        read: pysam.AlignedSegment to write.
+        bam_handles_for_barcodes: Dict mapping BAM file paths to open pysam write handles.
+            Updated in-place when a new file handle is opened.
+        barcode_bam_file_path: Path for the destination BAM file.
+        samfile_template: Open pysam.AlignmentFile used as the header template.
+    """
     bam_for_barcode = bam_handles_for_barcodes.get(barcode_bam_file_path)
 
     if not bam_for_barcode:
@@ -477,6 +614,11 @@ def write_read_to_bam_file(read, bam_handles_for_barcodes, barcode_bam_file_path
     bam_for_barcode.write(read)
 
 def remove_file_if_exists(file_path):
+    """Delete a file or directory tree if it exists, silently ignoring missing paths.
+
+    Args:
+        file_path: Path to the file or directory to remove.
+    """
     if os.path.exists(file_path):  # Check if the path exists
         try:
             if os.path.isdir(file_path):  # If it's a directory, remove it with shutil.rmtree
@@ -487,6 +629,11 @@ def remove_file_if_exists(file_path):
             print(f"Error while deleting {file_path}: {e}")
 
 def make_folder(folder_path):
+    """Create a directory if it does not already exist, suppressing race-condition errors.
+
+    Args:
+        folder_path: Path of the directory to create.
+    """
     if not os.path.exists(folder_path):
         try:
             os.mkdir(folder_path)
@@ -494,6 +641,20 @@ def make_folder(folder_path):
             pass
 
 def only_keep_positions_for_region(contig, output_folder, positions_for_barcode, verbose=False):
+    """Filter a list of positions to only those within the genomic interval for contig.
+
+    Reads the edit_info filename for the contig to determine the min/max position
+    range of the interval, then returns only positions within that range.
+
+    Args:
+        contig: Contig label including barcode suffix (e.g. '9_AAACCCAA-1').
+        output_folder: Run output directory containing the edit_info/ subdirectory.
+        positions_for_barcode: Iterable of integer positions to filter.
+        verbose: Unused; reserved for future diagnostic output. Default False.
+
+    Returns:
+        List of positions within the contig's interval range, or empty list on error.
+    """
     contig_index = str(contig.split("_")[-1]).zfill(3)
     contig_base = contig.split("_")[0]
     
@@ -522,9 +683,33 @@ def only_keep_positions_for_region(contig, output_folder, positions_for_barcode,
         return []
         
 def check_read(read):
+    """Return True for all reads (placeholder read filter, always passes).
+
+    Args:
+        read: pysam.AlignedSegment; not inspected.
+
+    Returns:
+        True.
+    """
     return True
 
 def get_bulk_coverage_at_pos(samfile_for_barcode, contig_bam, just_contig, pos, paired_end=False, verbose=False):
+    """Return the read coverage depth at a single position for bulk sequencing.
+
+    Uses pysam.count_coverage for single-end data and pysam.pileup for paired-end
+    data to avoid double-counting paired reads.
+
+    Args:
+        samfile_for_barcode: Open pysam.AlignmentFile for the split BAM.
+        contig_bam: BAM file path (used for verbose logging only).
+        just_contig: Chromosome/contig name without suffix (e.g. '9').
+        pos: 1-based genomic position.
+        paired_end: Use pileup-based counting to avoid double-counting. Default False.
+        verbose: Enable diagnostic output. Default False.
+
+    Returns:
+        Integer coverage depth at pos.
+    """
     if not paired_end:
         if verbose:
             print("~~~~~~\n!!!!SINGLE END!!!!!\n~~~~~~~`")
@@ -572,8 +757,26 @@ import pandas as pd
 from collections import defaultdict
   
 
-def get_coverage_df(edit_info, contig, output_folder, barcode_tag='CB', paired_end=False, 
+def get_coverage_df(edit_info, contig, output_folder, barcode_tag='CB', paired_end=False,
                     verbose=False):
+    """Build a coverage DataFrame for all edit positions in a contig.
+
+    Opens the split BAM for the contig, iterates over each barcode and edited
+    position, and calls the appropriate coverage function (single-cell or bulk).
+
+    Args:
+        edit_info: Polars DataFrame of edit records for this contig.
+        contig: Contig label including barcode suffix for single-cell, or base
+            contig for bulk.
+        output_folder: Run output directory containing split_bams/.
+        barcode_tag: SAM tag for barcodes; None triggers bulk mode. Default 'CB'.
+        paired_end: Use pileup-based coverage counting. Default False.
+        verbose: Enable diagnostic output. Default False.
+
+    Returns:
+        Pandas DataFrame indexed by 'barcode:position' with columns coverage
+        and source, or an empty DataFrame on error.
+    """
     # Just for single-cell, or bulk paired-end
     
     if barcode_tag:
@@ -658,9 +861,21 @@ def get_coverage_df(edit_info, contig, output_folder, barcode_tag='CB', paired_e
 
     
 def get_coverage_wrapper(parameters):
+    """Worker function for Pool.imap_unordered; unpacks a 6-tuple and writes coverage TSV.
+
+    Builds a barcode:position index column, joins edit info with coverage
+    from get_coverage_df, and writes the result to output_folder/coverage/<contig>.tsv.
+
+    Args:
+        parameters: 6-tuple of (edit_info, contig, output_folder, barcode_tag,
+            paired_end, verbose).
+
+    Returns:
+        Path to the written coverage TSV file.
+    """
     edit_info, contig, output_folder, barcode_tag, paired_end, verbose = parameters
 
-    output_filename = '{}/coverage/{}.tsv'.format(output_folder, contig, header=False)
+    output_filename = '{}/coverage/{}.tsv'.format(output_folder, contig)
 
     """
     if os.path.exists(output_filename):
@@ -708,15 +923,39 @@ def get_coverage_wrapper(parameters):
 
 
 def sort_bam(bam_file_name):
+    """Sort a BAM file by coordinate using pysam and return the sorted file path.
+
+    Args:
+        bam_file_name: Path to the unsorted BAM file.
+
+    Returns:
+        Path to the sorted BAM file (bam_file_name + '.sorted.bam').
+    """
     output_name = bam_file_name + ".sorted.bam"
     pysam.sort("-o", output_name, bam_file_name)  
     return output_name
 
 
 def rm_bam(bam_file_name):
+    """Delete a BAM file from disk.
+
+    Args:
+        bam_file_name: Path to the BAM file to remove.
+    """
     os.remove(bam_file_name)
 
 def write_reads_to_file(reads, bam_file_name, header_string, barcode_tag="BC"):
+    """Write a list of read string representations to a new BAM file.
+
+    Builds an updated header that includes per-barcode contig entries for all
+    barcodes present in reads, then writes each read via pysam.AlignedSegment.fromstring.
+
+    Args:
+        reads: List of SAM-format read strings (as produced by pysam str(read)).
+        bam_file_name: Output BAM file path.
+        header_string: SAM header text used as the template.
+        barcode_tag: SAM tag identifying barcodes; used to determine contig naming. Default 'BC'.
+    """
     header = pysam.AlignmentHeader.from_text(header_string)
     
     header_dict = header.as_dict()
@@ -772,6 +1011,21 @@ def write_reads_to_file(reads, bam_file_name, header_string, barcode_tag="BC"):
         
            
 def concat_and_write_bams(contig, df_dict, header_string, split_bams_folder, barcode_tag='CB', number_of_expected_bams=4, verbose=False):
+    """Concatenate per-interval read DataFrames and write sorted, indexed per-suffix BAM files.
+
+    Merges reads from all subcontig intervals into a single Polars DataFrame,
+    partitions reads by barcode suffix, writes each partition to a separate BAM,
+    sorts and indexes it, then removes the unsorted copy.
+
+    Args:
+        contig: Contig name (e.g. '9').
+        df_dict: Dict mapping subcontig interval names to Polars DataFrames of read strings.
+        header_string: SAM header text for BAM file construction.
+        split_bams_folder: Destination directory for per-contig per-suffix BAM files.
+        barcode_tag: Suffix partitioning scheme; must be 'CB', 'IS', or 'IB'. Default 'CB'.
+        number_of_expected_bams: Expected BAM count (only used for non-CB tags). Default 4.
+        verbose: Enable per-contig diagnostic output. Default False.
+    """
     job_params = []
     
     # Sort the subcontig regions such that the reads are properly ordered 
@@ -865,6 +1119,12 @@ def concat_and_write_bams(contig, df_dict, header_string, split_bams_folder, bar
             
     
 def concat_and_write_bams_wrapper(params):
+    """Worker function for Pool.imap_unordered; unpacks a 7-tuple and calls concat_and_write_bams.
+
+    Args:
+        params: 7-tuple of (contig, df_dict, header_string, split_bams_folder,
+            barcode_tag, number_of_expected_bams, verbose).
+    """
     contig, df_dict, header_string, split_bams_folder, barcode_tag, number_of_expected_bams, verbose = params
     
     # print("df_dict keys: {}".format(df_dict.keys()))
@@ -926,10 +1186,6 @@ join -1 3 -2 4 -t $'\\t' {output_folder}/final_edit_info_no_coverage_sorted.tsv 
     print(f"Merged file saved to {output_file_path}")
             
 
-def generate_empty_matrix_file(matrix_output_filepath):
-    pass
-
-
 def pivot_depths_output(depths_input_filepath, matrix_output_filepath):
     """
     Transform depths data into a pivoted matrix with reformatted row and column labels.
@@ -971,13 +1227,27 @@ def pivot_depths_output(depths_input_filepath, matrix_output_filepath):
 
 
 def run_command(command):
+    """Execute a shell command, raising CalledProcessError on non-zero exit.
+
+    Args:
+        command: Shell command string to execute.
+
+    Raises:
+        subprocess.CalledProcessError: When the command exits with a non-zero status.
+    """
     # Run the samtools depth command
     subprocess.run(command, shell=True, check=True)
 
 
 def merge_files_by_chromosome(args):
-    """
-    Helper function to merge files for a single chromosome.
+    """Worker function for Pool.map; unpacks a 3-tuple and merges coverage TSV files for one chromosome.
+
+    Pastes coverage files column-wise using bash, writes the merged TSV, then
+    converts it to a sparse h5ad matrix.
+
+    Args:
+        args: 3-tuple of (chromosome, files, output_folder) where files is a list
+            of per-suffix coverage TSV paths for this chromosome.
     """
     chromosome, files, output_folder = args
     first_file = files[0]
@@ -1023,6 +1293,15 @@ def merge_files_by_chromosome(args):
 
 
 def create_zeros_df(indices, columns):
+    """Create a sparse zero-filled Pandas DataFrame with given row and column labels.
+
+    Args:
+        indices: Row index labels.
+        columns: Column labels.
+
+    Returns:
+        Pandas DataFrame backed by a sparse CSR matrix filled with zeros.
+    """
     return pd.DataFrame.sparse.from_spmatrix(
         sp.csr_matrix((len(indices), len(columns))),
         index=indices,
@@ -1309,6 +1588,11 @@ def prepare_pysam_coverage_args(bam_filepaths, output_folder, output_suffix='', 
 
 
 def check_folder_is_empty_warn_if_not(output_folder):
+    """Print a styled warning to stdout if output_folder exists and is non-empty.
+
+    Args:
+        output_folder: Path to the directory to check.
+    """
     # Check to make sure the folder is empty, otherwise prompt for overwriting
     if os.path.exists(output_folder):
         if any(os.scandir(output_folder)):
@@ -1364,6 +1648,18 @@ def make_depth_command_script_single_cell(paired_end, bam_filepaths, output_fold
 
 
 def calculate_sailor_score(sailor_row):
+    """Compute the SAILOR confidence score for a single editing site row.
+
+    Confidence is calculated as 1 - Beta_cdf(cov_margin | edits, non_edits)
+    using the scipy betainc function, producing a value in [0, 1].
+
+    Args:
+        sailor_row: Pandas Series with at least 'count' (edit reads) and
+            'coverage' (total reads) columns.
+
+    Returns:
+        Float confidence score in [0, 1], or None if the row is malformed.
+    """
     edits = sailor_row['count']
     num_reads = sailor_row['coverage']
     original_base_counts = num_reads - edits
@@ -1392,6 +1688,22 @@ def calculate_sailor_score(sailor_row):
     
 
 def get_sailor_sites(final_site_level_information_df, conversion="C>T", skip_coverage=False):
+    """Filter site-level edit data to a single conversion and format as SAILOR BED rows.
+
+    Removes sites with zero coverage or more edits than coverage, calculates
+    per-site SAILOR confidence scores, and returns columns compatible with
+    SAILOR-format BED output.
+
+    Args:
+        final_site_level_information_df: Pandas DataFrame with strand_conversion,
+            count, coverage, contig, position, and strand columns.
+        conversion: Strand-qualified conversion string to filter on (e.g. 'A>G+'). Default 'C>T'.
+        skip_coverage: When True, set coverage to -1 and skip score calculation. Default False.
+
+    Returns:
+        tuple: (sailor_sites DataFrame, weird_sites DataFrame) where weird_sites
+            contains rows with zero coverage or impossible edit counts.
+    """
     final_site_level_information_df = final_site_level_information_df[final_site_level_information_df['strand_conversion'] == conversion]
 
     if skip_coverage:
@@ -1430,6 +1742,17 @@ def get_sailor_sites(final_site_level_information_df, conversion="C>T", skip_cov
 
 
 def concatenate_files(source_folder, file_pattern, output_filepath, run=False):
+    """Concatenate matching files from source_folder into a single output file, skipping headers.
+
+    Builds and optionally executes a bash script that iterates over files
+    matching file_pattern in numerical order and concatenates their bodies.
+
+    Args:
+        source_folder: Directory containing files to concatenate.
+        file_pattern: Shell glob pattern for the files to include.
+        output_filepath: Path for the merged output file.
+        run: When True, execute the concatenation script immediately. Default False.
+    """
     # Create the concatenation command with numeric sorting and header skipping
     concat_command = (
         f"for f in $(ls -v {source_folder}/{file_pattern}); do "
@@ -1448,9 +1771,21 @@ def concatenate_files(source_folder, file_pattern, output_filepath, run=False):
         print("Done concatenating.")
 
 
-def get_edits_with_coverage_df(output_folder,
-                               barcode_tag=None):
+def get_edits_with_coverage_df(output_folder, barcode_tag=None):
+    """Load the final_edit_info.tsv and normalize contig labels to remove barcode suffixes.
 
+    Reads the merged edit+coverage TSV and strips the barcode portion appended
+    to contig names during single-cell processing so that downstream tools see
+    plain contig identifiers.
+
+    Args:
+        output_folder: Run output directory containing final_edit_info.tsv.
+        barcode_tag: When not None, signals single-cell mode (contig labels include
+            a barcode suffix to strip). Default None.
+
+    Returns:
+        Pandas DataFrame with normalized contig column and all coverage fields.
+    """
     all_edit_info_unique_position_with_coverage_df = pd.read_csv('{}/final_edit_info.tsv'.format(output_folder), sep='\t',
                                                                      dtype={'coverage': int, 'position': int,
                                                                                              'contig': str})
@@ -1468,6 +1803,25 @@ def get_edits_with_coverage_df(output_folder,
 
 
 def zero_edit_found(final_site_level_information_df, output_folder, sailor_list, bedgraphs_list, keep_intermediate_files, start_time, logging_folder):
+    """Write empty output files and finalize the run when no edits were detected.
+
+    Creates empty TSV/BED/bedGraph files for all requested output types,
+    logs memory usage and elapsed time to manifest.txt, and optionally
+    deletes intermediate files.
+
+    Args:
+        final_site_level_information_df: DataFrame expected to be empty; used
+            only for length logging.
+        output_folder: Run output directory.
+        sailor_list: List of conversion strings for which to write empty SAILOR BEDs.
+        bedgraphs_list: List of conversion strings for which to write empty bedGraphs.
+        keep_intermediate_files: When False, delete intermediate output files. Default False.
+        start_time: Unix timestamp from time.time() at run start.
+        logging_folder: Path to the metadata/ directory containing manifest.txt.
+
+    Returns:
+        'Done' string sentinel.
+    """
     print("No edits found.")
     sites_columns = ['site_id','barcode','contig','position','ref','alt','strand','count','coverage','conversion','strand_conversion']
     sites_empty_df = pd.DataFrame(columns=sites_columns)
@@ -1512,7 +1866,13 @@ def zero_edit_found(final_site_level_information_df, output_folder, sailor_list,
 
 
 def delete_intermediate_files(output_folder, contains=None):
-    
+    """Remove a predefined set of intermediate directories and files from output_folder.
+
+    Args:
+        output_folder: Run output directory from which to delete files.
+        contains: When provided, only delete entries whose name contains this
+            substring. Default None (delete all predefined entries).
+    """
     to_delete = ['coverage', 'edit_info', 'split_bams', 'combined_all_cells_split_by_suffix',
                  'combined_source_cells_split_by_suffix',
                  'matrix_outputs',
@@ -1534,3 +1894,6 @@ def delete_intermediate_files(output_folder, contains=None):
 
         sys.stdout.write(f"~~~~ WARNING: Removing existing object\n{object_path}\n")
         remove_file_if_exists(object_path)
+
+def generate_empty_matrix_file(matrix_output_filepath):
+    pass
