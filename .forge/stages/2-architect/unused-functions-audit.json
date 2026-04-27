@@ -1,0 +1,3242 @@
+{
+  "schema_version": "1.0.0",
+  "generated_utc": "2026-04-26T17:56:25.691799+00:00",
+  "files_audited": [
+    "marine.py",
+    "src/core.py",
+    "src/utils.py",
+    "src/read_process.py"
+  ],
+  "function_count_total": 95,
+  "function_count_keep": 94,
+  "function_count_remove_candidate": 1,
+  "functions": [
+    {
+      "name": "get_unique_barcodes",
+      "file": "marine.py",
+      "line": 39,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "called_internally",
+          "location": "marine.py:80"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "get_unique_barcodes_for_reads_in_bamfile",
+      "file": "marine.py",
+      "line": 68,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "pool_worker",
+          "location": null
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "get_suffix_pairs_from_bam_filepath",
+      "file": "marine.py",
+      "line": 86,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "called_internally",
+          "location": "marine.py:126"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "prepare_combinations_for_split",
+      "file": "marine.py",
+      "line": 108,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "called_internally",
+          "location": "marine.py:271"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "process_combination_for_split",
+      "file": "marine.py",
+      "line": 170,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "pool_worker",
+          "location": null
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "filter_sites_using_tabulation_bed",
+      "file": "marine.py",
+      "line": 193,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "called_internally",
+          "location": "marine.py:261"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "generate_and_split_bed_files_for_all_positions",
+      "file": "marine.py",
+      "line": 225,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "called_internally",
+          "location": "marine.py:511"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/unittests.py:130"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "run",
+      "file": "marine.py",
+      "line": 296,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "called_internally",
+          "location": "marine.py:58"
+        },
+        {
+          "rule": "called_internally",
+          "location": "marine.py:547"
+        },
+        {
+          "rule": "called_internally",
+          "location": "marine.py:707"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/utils.py:1185"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/utils.py:1248"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/utils.py:1773"
+        },
+        {
+          "rule": "called_internally",
+          "location": "tests/unittests.py:108"
+        },
+        {
+          "rule": "called_internally",
+          "location": "tests/unittests.py:118"
+        },
+        {
+          "rule": "called_internally",
+          "location": "tests/unittests.py:120"
+        },
+        {
+          "rule": "called_internally",
+          "location": "tests/bam_files/.ipynb_checkpoints/memray-flamegraph-output-checkpoint.html:306"
+        },
+        {
+          "rule": "cli_entry_point",
+          "location": "marine.py:__main__"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/strandedness_tests/README.txt:4"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/strandedness_tests/bams/tax1bp3_chr17_3665556_read.sam:198"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/strandedness_tests/bams/tax1bp3_chr17_3665556_read.sam:203"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/TESTS_README.txt:1"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/unittests.py:107"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/unittests.py:108"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/unittests.py:113"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/unittests.py:118"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/unittests.py:120"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/.pytest_cache/v/cache/nodeids:13"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/bam_files/.ipynb_checkpoints/memray-flamegraph-output-checkpoint.html:124"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/bam_files/.ipynb_checkpoints/memray-flamegraph-output-checkpoint.html:212"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/bam_files/.ipynb_checkpoints/memray-flamegraph-output-checkpoint.html:218"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/bam_files/.ipynb_checkpoints/memray-flamegraph-output-checkpoint.html:306"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/bam_files/.ipynb_checkpoints/memray-flamegraph-output-checkpoint.html:331"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/conftest.py:12"
+        },
+        {
+          "rule": "referenced_in_ci",
+          "location": ".github/workflows/main.yml:13"
+        },
+        {
+          "rule": "referenced_in_ci",
+          "location": ".github/workflows/main.yml:20"
+        },
+        {
+          "rule": "referenced_in_ci",
+          "location": ".github/workflows/main.yml:24"
+        },
+        {
+          "rule": "referenced_in_ci",
+          "location": ".github/workflows/main.yml:31"
+        },
+        {
+          "rule": "referenced_in_ci",
+          "location": ".github/workflows/main.yml:36"
+        },
+        {
+          "rule": "referenced_in_ci",
+          "location": ".github/workflows/main.yml:41"
+        },
+        {
+          "rule": "referenced_in_ci",
+          "location": ".github/workflows/main.yml:42"
+        },
+        {
+          "rule": "referenced_in_ci",
+          "location": ".github/workflows/main.yml:43"
+        },
+        {
+          "rule": "referenced_in_ci",
+          "location": ".github/workflows/main.yml:44"
+        },
+        {
+          "rule": "referenced_in_ci",
+          "location": ".github/workflows/main.yml:49"
+        },
+        {
+          "rule": "referenced_in_ci",
+          "location": ".github/workflows/main.yml:63"
+        },
+        {
+          "rule": "referenced_in_ci",
+          "location": ".github/workflows/main.yml:67"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "check_samtools",
+      "file": "marine.py",
+      "line": 536,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "called_internally",
+          "location": "marine.py:699"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "generate_depths",
+      "file": "src/core.py",
+      "line": 28,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "marine.py:32"
+        },
+        {
+          "rule": "called_internally",
+          "location": "marine.py:401"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:28"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "bam_processing",
+      "file": "src/core.py",
+      "line": 115,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "called_internally",
+          "location": "src/core.py:454"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:97"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:329"
+        },
+        {
+          "rule": "called_internally",
+          "location": "tests/bam_files/.ipynb_checkpoints/memray-flamegraph-output-checkpoint.html:306"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/bam_files/.ipynb_checkpoints/memray-flamegraph-output-checkpoint.html:306"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "edit_finder",
+      "file": "src/core.py",
+      "line": 162,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "called_internally",
+          "location": "src/core.py:424"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:130"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:299"
+        },
+        {
+          "rule": "called_internally",
+          "location": "tests/bam_files/.ipynb_checkpoints/memray-flamegraph-output-checkpoint.html:306"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/bam_files/.ipynb_checkpoints/memray-flamegraph-output-checkpoint.html:306"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "run_edit_identifier",
+      "file": "src/core.py",
+      "line": 227,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "marine.py:32"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/core.py:191"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:136"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:172"
+        },
+        {
+          "rule": "called_internally",
+          "location": "tests/bam_files/.ipynb_checkpoints/memray-flamegraph-output-checkpoint.html:306"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/bam_files/.ipynb_checkpoints/memray-flamegraph-output-checkpoint.html:306"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "run_bam_reconfiguration",
+      "file": "src/core.py",
+      "line": 310,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "marine.py:32"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/core.py:144"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:112"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:232"
+        },
+        {
+          "rule": "called_internally",
+          "location": "tests/bam_files/.ipynb_checkpoints/memray-flamegraph-output-checkpoint.html:306"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/bam_files/.ipynb_checkpoints/memray-flamegraph-output-checkpoint.html:306"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "run_edit_finding",
+      "file": "src/core.py",
+      "line": 357,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "marine.py:32"
+        },
+        {
+          "rule": "called_internally",
+          "location": "marine.py:374"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:259"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "incorporate_barcode",
+      "file": "src/core.py",
+      "line": 475,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "called_internally",
+          "location": "src/core.py:612"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:349"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:439"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "write_bam_file",
+      "file": "src/core.py",
+      "line": 493,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "called_internally",
+          "location": "src/core.py:642"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:357"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:469"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "find_edits",
+      "file": "src/core.py",
+      "line": 518,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "called_internally",
+          "location": "src/core.py:676"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/read_process-checkpoint.py:108"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:370"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:480"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/bam_files/.ipynb_checkpoints/memray-flamegraph-output-checkpoint.html:306"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "find_edits_and_split_bams",
+      "file": "src/core.py",
+      "line": 652,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "called_internally",
+          "location": "src/core.py:713"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:479"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:501"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/bam_files/.ipynb_checkpoints/memray-flamegraph-output-checkpoint.html:306"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "find_edits_and_split_bams_wrapper",
+      "file": "src/core.py",
+      "line": 691,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:495"
+        },
+        {
+          "rule": "pool_worker",
+          "location": null
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/bam_files/.ipynb_checkpoints/memray-flamegraph-output-checkpoint.html:306"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "run_coverage_calculator",
+      "file": "src/core.py",
+      "line": 765,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "marine.py:32"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:553"
+        },
+        {
+          "rule": "called_internally",
+          "location": "tests/bam_files/.ipynb_checkpoints/memray-flamegraph-output-checkpoint.html:306"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/bam_files/.ipynb_checkpoints/memray-flamegraph-output-checkpoint.html:306"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "get_job_params_for_coverage_for_edits_in_contig",
+      "file": "src/core.py",
+      "line": 823,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "called_internally",
+          "location": "src/core.py:791"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:560"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:592"
+        },
+        {
+          "rule": "called_internally",
+          "location": "tests/bam_files/.ipynb_checkpoints/memray-flamegraph-output-checkpoint.html:306"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/bam_files/.ipynb_checkpoints/memray-flamegraph-output-checkpoint.html:306"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "gather_edit_information_across_subcontigs",
+      "file": "src/core.py",
+      "line": 847,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "marine.py:32"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:603"
+        },
+        {
+          "rule": "called_internally",
+          "location": "tests/bam_files/.ipynb_checkpoints/memray-flamegraph-output-checkpoint.html:306"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/bam_files/.ipynb_checkpoints/memray-flamegraph-output-checkpoint.html:306"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "add_site_id",
+      "file": "src/core.py",
+      "line": 919,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "called_internally",
+          "location": "src/core.py:993"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:659"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:692"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "get_count_and_coverage_per_site",
+      "file": "src/core.py",
+      "line": 951,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "called_internally",
+          "location": "src/core.py:1003"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:678"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:702"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "generate_site_level_information",
+      "file": "src/core.py",
+      "line": 974,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "marine.py:32"
+        },
+        {
+          "rule": "called_internally",
+          "location": "marine.py:419"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:689"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "print_marine_logo",
+      "file": "src/utils.py",
+      "line": 26,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "marine.py:27"
+        },
+        {
+          "rule": "called_internally",
+          "location": "marine.py:630"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "generate_permutations_list_for_CB",
+      "file": "src/utils.py",
+      "line": 45,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "called_internally",
+          "location": "src/utils.py:67"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "generate_bedgraphs",
+      "file": "src/utils.py",
+      "line": 125,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "marine.py:27"
+        },
+        {
+          "rule": "called_internally",
+          "location": "marine.py:447"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "convert_sites_to_sailor",
+      "file": "src/utils.py",
+      "line": 149,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "marine.py:27"
+        },
+        {
+          "rule": "called_internally",
+          "location": "marine.py:443"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "split_bed_file",
+      "file": "src/utils.py",
+      "line": 186,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "src/core.py:20"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/core.py:71"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:53"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/unittests.py:130"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "get_contigs_that_need_bams_written",
+      "file": "src/utils.py",
+      "line": 231,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "src/core.py:20"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/core.py:134"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/utils-checkpoint.py:11"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:102"
+        },
+        {
+          "rule": "called_internally",
+          "location": "tests/bam_files/.ipynb_checkpoints/memray-flamegraph-output-checkpoint.html:306"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/bam_files/.ipynb_checkpoints/memray-flamegraph-output-checkpoint.html:306"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "get_broken_up_contigs",
+      "file": "src/utils.py",
+      "line": 268,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "src/core.py:20"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/core.py:412"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:287"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "pivot_edits_to_sparse",
+      "file": "src/utils.py",
+      "line": 295,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "marine.py:27"
+        },
+        {
+          "rule": "called_internally",
+          "location": "marine.py:280"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "make_edit_finding_jobs",
+      "file": "src/utils.py",
+      "line": 357,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "src/core.py:20"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/core.py:256"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/utils-checkpoint.py:34"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:178"
+        },
+        {
+          "rule": "called_internally",
+          "location": "tests/bam_files/.ipynb_checkpoints/memray-flamegraph-output-checkpoint.html:306"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/bam_files/.ipynb_checkpoints/memray-flamegraph-output-checkpoint.html:306"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "get_contig_lengths_dict",
+      "file": "src/utils.py",
+      "line": 411,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "src/core.py:20"
+        },
+        {
+          "rule": "imported_by_name",
+          "location": "tests/unittests.py:9"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/utils-checkpoint.py:38"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/utils-checkpoint.py:70"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/utils.py:383"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/.ipynb_checkpoints/unittests-checkpoint.py:9"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/unittests.py:9"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/bam_files/.ipynb_checkpoints/memray-flamegraph-output-checkpoint.html:306"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "read_barcode_whitelist_file",
+      "file": "src/utils.py",
+      "line": 436,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "src/core.py:20"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/core.py:402"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/utils-checkpoint.py:95"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:277"
+        },
+        {
+          "rule": "called_internally",
+          "location": "tests/bam_files/.ipynb_checkpoints/memray-flamegraph-output-checkpoint.html:306"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/bam_files/.ipynb_checkpoints/memray-flamegraph-output-checkpoint.html:306"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "print_all_cells_coverage_warning",
+      "file": "src/utils.py",
+      "line": 451,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "marine.py:27"
+        },
+        {
+          "rule": "called_internally",
+          "location": "marine.py:639"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "convert_conversions_argument",
+      "file": "src/utils.py",
+      "line": 471,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "marine.py:27"
+        },
+        {
+          "rule": "called_internally",
+          "location": "marine.py:641"
+        },
+        {
+          "rule": "called_internally",
+          "location": "marine.py:642"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "pretty_print",
+      "file": "src/utils.py",
+      "line": 500,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "marine.py:27"
+        },
+        {
+          "rule": "imported_by_name",
+          "location": "src/core.py:20"
+        },
+        {
+          "rule": "called_internally",
+          "location": "marine.py:242"
+        },
+        {
+          "rule": "called_internally",
+          "location": "marine.py:367"
+        },
+        {
+          "rule": "called_internally",
+          "location": "marine.py:397"
+        },
+        {
+          "rule": "called_internally",
+          "location": "marine.py:410"
+        },
+        {
+          "rule": "called_internally",
+          "location": "marine.py:415"
+        },
+        {
+          "rule": "called_internally",
+          "location": "marine.py:420"
+        },
+        {
+          "rule": "called_internally",
+          "location": "marine.py:421"
+        },
+        {
+          "rule": "called_internally",
+          "location": "marine.py:432"
+        },
+        {
+          "rule": "called_internally",
+          "location": "marine.py:463"
+        },
+        {
+          "rule": "called_internally",
+          "location": "marine.py:501"
+        },
+        {
+          "rule": "called_internally",
+          "location": "marine.py:531"
+        },
+        {
+          "rule": "called_internally",
+          "location": "marine.py:534"
+        },
+        {
+          "rule": "called_internally",
+          "location": "marine.py:647"
+        },
+        {
+          "rule": "called_internally",
+          "location": "marine.py:664"
+        },
+        {
+          "rule": "called_internally",
+          "location": "marine.py:669"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/core.py:140"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/core.py:188"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/core.py:209"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/core.py:257"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/core.py:449"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/core.py:450"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/core.py:456"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/utils-checkpoint.py:57"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/utils-checkpoint.py:98"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/utils-checkpoint.py:102"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/utils-checkpoint.py:105"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/utils-checkpoint.py:118"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/utils-checkpoint.py:124"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:108"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:133"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:154"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:179"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:324"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:325"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:331"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/utils.py:39"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/utils.py:41"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/utils.py:137"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/utils.py:398"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/utils.py:448"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/utils.py:512"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/utils.py:526"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/utils.py:532"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/utils.py:1606"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/utils.py:1625"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/utils.py:1628"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/utils.py:1636"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/utils.py:1864"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/utils.py:1867"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "get_intervals",
+      "file": "src/utils.py",
+      "line": 534,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "src/core.py:20"
+        },
+        {
+          "rule": "imported_by_name",
+          "location": "tests/unittests.py:9"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/utils-checkpoint.py:60"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/utils-checkpoint.py:126"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/utils.py:401"
+        },
+        {
+          "rule": "called_internally",
+          "location": "tests/unittests.py:80"
+        },
+        {
+          "rule": "called_internally",
+          "location": "tests/unittests.py:87"
+        },
+        {
+          "rule": "called_internally",
+          "location": "tests/unittests.py:92"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/unittests.py:9"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/unittests.py:78"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/unittests.py:80"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/unittests.py:85"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/unittests.py:87"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/unittests.py:90"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/unittests.py:92"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/.pytest_cache/v/cache/nodeids:9"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/.pytest_cache/v/cache/nodeids:10"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/.pytest_cache/v/cache/nodeids:11"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/bam_files/.ipynb_checkpoints/memray-flamegraph-output-checkpoint.html:306"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "index_bam",
+      "file": "src/utils.py",
+      "line": 562,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "src/core.py:20"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/core.py:512"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/utils-checkpoint.py:148"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/utils-checkpoint.py:259"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/utils-checkpoint.py:509"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:364"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/utils.py:795"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/utils.py:1114"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/bam_files/.ipynb_checkpoints/memray-flamegraph-output-checkpoint.html:306"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "write_rows_to_info_file",
+      "file": "src/utils.py",
+      "line": 579,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "src/core.py:20"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/core.py:606"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/utils-checkpoint.py:157"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:433"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/bam_files/.ipynb_checkpoints/memray-flamegraph-output-checkpoint.html:306"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "write_header_to_edit_info",
+      "file": "src/utils.py",
+      "line": 590,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "src/core.py:20"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/core.py:568"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/utils-checkpoint.py:162"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:395"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/bam_files/.ipynb_checkpoints/memray-flamegraph-output-checkpoint.html:306"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "write_read_to_bam_file",
+      "file": "src/utils.py",
+      "line": 598,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "src/core.py:20"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/utils-checkpoint.py:165"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "remove_file_if_exists",
+      "file": "src/utils.py",
+      "line": 616,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "marine.py:27"
+        },
+        {
+          "rule": "imported_by_name",
+          "location": "src/core.py:20"
+        },
+        {
+          "rule": "called_internally",
+          "location": "marine.py:254"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/core.py:565"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/utils-checkpoint.py:174"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:392"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/utils.py:1445"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/utils.py:1899"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "make_folder",
+      "file": "src/utils.py",
+      "line": 631,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "marine.py:27"
+        },
+        {
+          "rule": "imported_by_name",
+          "location": "src/core.py:20"
+        },
+        {
+          "rule": "called_internally",
+          "location": "marine.py:479"
+        },
+        {
+          "rule": "called_internally",
+          "location": "marine.py:657"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/core.py:68"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/core.py:133"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/core.py:254"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/core.py:635"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/core.py:638"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/utils-checkpoint.py:179"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:50"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:101"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:176"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:462"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:465"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/utils.py:135"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/utils.py:1848"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "only_keep_positions_for_region",
+      "file": "src/utils.py",
+      "line": 643,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/utils-checkpoint.py:183"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/utils-checkpoint.py:279"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "check_read",
+      "file": "src/utils.py",
+      "line": 685,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/utils-checkpoint.py:211"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "get_bulk_coverage_at_pos",
+      "file": "src/utils.py",
+      "line": 696,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/utils-checkpoint.py:214"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/utils-checkpoint.py:319"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/utils.py:848"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "get_coverage_df",
+      "file": "src/utils.py",
+      "line": 760,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/utils-checkpoint.py:251"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/utils-checkpoint.py:349"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/utils.py:901"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "get_coverage_wrapper",
+      "file": "src/utils.py",
+      "line": 863,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "src/core.py:20"
+        },
+        {
+          "rule": "imported_by_name",
+          "location": "tests/unittests.py:98"
+        },
+        {
+          "rule": "pool_worker",
+          "location": null
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/unittests.py:95"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/unittests.py:98"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/unittests.py:99"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/.pytest_cache/v/cache/nodeids:8"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "sort_bam",
+      "file": "src/utils.py",
+      "line": 925,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "src/core.py:20"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/core.py:510"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/utils-checkpoint.py:360"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/utils-checkpoint.py:507"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:362"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/utils.py:1112"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "rm_bam",
+      "file": "src/utils.py",
+      "line": 939,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "src/core.py:20"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/core.py:513"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/utils-checkpoint.py:366"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/utils-checkpoint.py:510"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:365"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/utils.py:1115"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "write_reads_to_file",
+      "file": "src/utils.py",
+      "line": 947,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "src/core.py:20"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/core.py:507"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/utils-checkpoint.py:369"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/utils-checkpoint.py:504"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:359"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/utils.py:1109"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "concat_and_write_bams",
+      "file": "src/utils.py",
+      "line": 1013,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/utils-checkpoint.py:425"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/utils-checkpoint.py:519"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/utils.py:1131"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/bam_files/.ipynb_checkpoints/memray-flamegraph-output-checkpoint.html:306"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "concat_and_write_bams_wrapper",
+      "file": "src/utils.py",
+      "line": 1121,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "src/core.py:20"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/utils-checkpoint.py:515"
+        },
+        {
+          "rule": "pool_worker",
+          "location": null
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/bam_files/.ipynb_checkpoints/memray-flamegraph-output-checkpoint.html:306"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "generate_and_run_bash_merge",
+      "file": "src/utils.py",
+      "line": 1134,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "src/core.py:20"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/core.py:103"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:85"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "generate_empty_matrix_file",
+      "file": "src/utils.py",
+      "line": 1189,
+      "classification": "REMOVE_CANDIDATE",
+      "evidence": [
+        {
+          "rule": "no_imports_found",
+          "location": null
+        },
+        {
+          "rule": "no_internal_calls_found",
+          "location": null
+        },
+        {
+          "rule": "no_test_references",
+          "location": null
+        },
+        {
+          "rule": "not_a_pool_worker",
+          "location": null
+        },
+        {
+          "rule": "not_a_cli_entry",
+          "location": null
+        }
+      ],
+      "removal_note": "Body is a bare pass statement. No call sites found anywhere in marine.py, src/, or tests/. Name suggests it was a planned stub for initializing empty matrix output files, but was never implemented or wired up. Safe to remove; no callers exist."
+    },
+    {
+      "name": "pivot_depths_output",
+      "file": "src/utils.py",
+      "line": 1198,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "called_internally",
+          "location": "src/utils.py:1532"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "run_command",
+      "file": "src/utils.py",
+      "line": 1238,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "src/core.py:20"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/core.py:60"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/core.py:89"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:42"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:71"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/utils.py:1268"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/utils.py:1474"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "merge_files_by_chromosome",
+      "file": "src/utils.py",
+      "line": 1251,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "pool_worker",
+          "location": null
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "create_zeros_df",
+      "file": "src/utils.py",
+      "line": 1298,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "called_internally",
+          "location": "src/utils.py:1375"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/utils.py:1382"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "sum_adata_cellwise",
+      "file": "src/utils.py",
+      "line": 1315,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "called_internally",
+          "location": "src/utils.py:1403"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "combine_coverage_adatas",
+      "file": "src/utils.py",
+      "line": 1346,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "called_internally",
+          "location": "src/utils.py:1458"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "prepare_matrix_files_multiprocess",
+      "file": "src/utils.py",
+      "line": 1409,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "called_internally",
+          "location": "src/utils.py:1637"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "merge_depth_files",
+      "file": "src/utils.py",
+      "line": 1464,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "called_internally",
+          "location": "src/utils.py:1629"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "format_time",
+      "file": "src/utils.py",
+      "line": 1478,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "called_internally",
+          "location": "src/utils.py:1525"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/utils.py:1535"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "calculate_coverage",
+      "file": "src/utils.py",
+      "line": 1485,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "called_as_pool_worker_object",
+          "location": "src/utils.py:1544"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "run_pysam_count_coverage",
+      "file": "src/utils.py",
+      "line": 1538,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "called_internally",
+          "location": "src/utils.py:1626"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "prepare_pysam_coverage_args",
+      "file": "src/utils.py",
+      "line": 1551,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "called_internally",
+          "location": "src/utils.py:1618"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "check_folder_is_empty_warn_if_not",
+      "file": "src/utils.py",
+      "line": 1593,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "marine.py:27"
+        },
+        {
+          "rule": "called_internally",
+          "location": "marine.py:631"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "make_depth_command_script_single_cell",
+      "file": "src/utils.py",
+      "line": 1610,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "marine.py:27"
+        },
+        {
+          "rule": "imported_by_name",
+          "location": "src/core.py:20"
+        },
+        {
+          "rule": "called_internally",
+          "location": "marine.py:519"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/core.py:78"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:60"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "calculate_sailor_score",
+      "file": "src/utils.py",
+      "line": 1653,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "called_via_dataframe_apply",
+          "location": "src/utils.py:1738"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "get_sailor_sites",
+      "file": "src/utils.py",
+      "line": 1693,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "called_internally",
+          "location": "src/utils.py:173"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "concatenate_files",
+      "file": "src/utils.py",
+      "line": 1747,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "marine.py:27"
+        },
+        {
+          "rule": "imported_by_name",
+          "location": "src/core.py:20"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/core.py:93"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:75"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "get_edits_with_coverage_df",
+      "file": "src/utils.py",
+      "line": 1777,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "marine.py:27"
+        },
+        {
+          "rule": "called_internally",
+          "location": "marine.py:412"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "zero_edit_found",
+      "file": "src/utils.py",
+      "line": 1808,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "marine.py:27"
+        },
+        {
+          "rule": "called_internally",
+          "location": "marine.py:425"
+        },
+        {
+          "rule": "called_internally",
+          "location": "marine.py:458"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/unittests.py:108"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/unittests.py:114"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/unittests.py:116"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/unittests.py:120"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/unittests.py:122"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "delete_intermediate_files",
+      "file": "src/utils.py",
+      "line": 1871,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "marine.py:27"
+        },
+        {
+          "rule": "called_internally",
+          "location": "marine.py:503"
+        },
+        {
+          "rule": "called_internally",
+          "location": "marine.py:532"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/utils.py:1865"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "reverse_complement",
+      "file": "src/read_process.py",
+      "line": 15,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "src/core.py:15"
+        },
+        {
+          "rule": "imported_by_name",
+          "location": "tests/unittests.py:10"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/read_process-checkpoint.py:14"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/read_process-checkpoint.py:396"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/read_process.py:602"
+        },
+        {
+          "rule": "called_internally",
+          "location": "tests/.ipynb_checkpoints/unittests-checkpoint.py:15"
+        },
+        {
+          "rule": "called_internally",
+          "location": "tests/.ipynb_checkpoints/unittests-checkpoint.py:20"
+        },
+        {
+          "rule": "called_internally",
+          "location": "tests/unittests.py:15"
+        },
+        {
+          "rule": "called_internally",
+          "location": "tests/unittests.py:20"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/.ipynb_checkpoints/unittests-checkpoint.py:11"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/.ipynb_checkpoints/unittests-checkpoint.py:15"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/.ipynb_checkpoints/unittests-checkpoint.py:17"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/.ipynb_checkpoints/unittests-checkpoint.py:20"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/unittests.py:11"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/unittests.py:15"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/unittests.py:17"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/unittests.py:20"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/.pytest_cache/v/cache/nodeids:7"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "incorporate_insertions_and_deletions",
+      "file": "src/read_process.py",
+      "line": 27,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "src/core.py:15"
+        },
+        {
+          "rule": "imported_by_name",
+          "location": "tests/unittests.py:10"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/read_process-checkpoint.py:26"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/read_process-checkpoint.py:325"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/read_process-checkpoint.py:326"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/read_process-checkpoint.py:336"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/read_process.py:513"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/read_process.py:514"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/read_process.py:524"
+        },
+        {
+          "rule": "called_internally",
+          "location": "tests/.ipynb_checkpoints/unittests-checkpoint.py:31"
+        },
+        {
+          "rule": "called_internally",
+          "location": "tests/.ipynb_checkpoints/unittests-checkpoint.py:43"
+        },
+        {
+          "rule": "called_internally",
+          "location": "tests/unittests.py:31"
+        },
+        {
+          "rule": "called_internally",
+          "location": "tests/unittests.py:43"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/.ipynb_checkpoints/unittests-checkpoint.py:10"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/.ipynb_checkpoints/unittests-checkpoint.py:31"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/.ipynb_checkpoints/unittests-checkpoint.py:43"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/unittests.py:10"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/unittests.py:31"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/unittests.py:43"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/bam_files/.ipynb_checkpoints/memray-flamegraph-output-checkpoint.html:306"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "get_hamming_distance",
+      "file": "src/read_process.py",
+      "line": 60,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "src/core.py:15"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/read_process-checkpoint.py:59"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/read_process-checkpoint.py:377"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/read_process.py:567"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "has_edits",
+      "file": "src/read_process.py",
+      "line": 80,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "src/core.py:15"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/read_process-checkpoint.py:70"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/read_process-checkpoint.py:129"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/read_process.py:234"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "get_total_coverage_for_contig_at_position",
+      "file": "src/read_process.py",
+      "line": 104,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "src/core.py:15"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/read_process-checkpoint.py:82"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "print_read_info",
+      "file": "src/read_process.py",
+      "line": 120,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "src/core.py:15"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/read_process-checkpoint.py:89"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/read_process-checkpoint.py:154"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/read_process.py:260"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "get_read_information",
+      "file": "src/read_process.py",
+      "line": 148,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "src/core.py:15"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/core.py:595"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/read_process-checkpoint.py:106"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/core-checkpoint.py:422"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "get_positions_from_md_tag",
+      "file": "src/read_process.py",
+      "line": 318,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "src/core.py:15"
+        },
+        {
+          "rule": "imported_by_name",
+          "location": "tests/unittests.py:10"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/read_process-checkpoint.py:194"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/read_process-checkpoint.py:323"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/read_process.py:511"
+        },
+        {
+          "rule": "called_internally",
+          "location": "tests/.ipynb_checkpoints/unittests-checkpoint.py:46"
+        },
+        {
+          "rule": "called_internally",
+          "location": "tests/.ipynb_checkpoints/unittests-checkpoint.py:54"
+        },
+        {
+          "rule": "called_internally",
+          "location": "tests/unittests.py:46"
+        },
+        {
+          "rule": "called_internally",
+          "location": "tests/unittests.py:54"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/.ipynb_checkpoints/unittests-checkpoint.py:11"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/.ipynb_checkpoints/unittests-checkpoint.py:46"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/.ipynb_checkpoints/unittests-checkpoint.py:47"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/.ipynb_checkpoints/unittests-checkpoint.py:54"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/unittests.py:11"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/unittests.py:46"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/unittests.py:47"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/unittests.py:54"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/.pytest_cache/v/cache/nodeids:2"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "incorporate_replaced_pos_info",
+      "file": "src/read_process.py",
+      "line": 376,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "src/core.py:15"
+        },
+        {
+          "rule": "imported_by_name",
+          "location": "tests/unittests.py:10"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/read_process-checkpoint.py:251"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/read_process-checkpoint.py:335"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/read_process-checkpoint.py:337"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/read_process.py:523"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/read_process.py:525"
+        },
+        {
+          "rule": "called_internally",
+          "location": "tests/.ipynb_checkpoints/unittests-checkpoint.py:57"
+        },
+        {
+          "rule": "called_internally",
+          "location": "tests/.ipynb_checkpoints/unittests-checkpoint.py:59"
+        },
+        {
+          "rule": "called_internally",
+          "location": "tests/unittests.py:57"
+        },
+        {
+          "rule": "called_internally",
+          "location": "tests/unittests.py:59"
+        },
+        {
+          "rule": "called_internally",
+          "location": "tests/bam_files/.ipynb_checkpoints/memray-flamegraph-output-checkpoint.html:306"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/.ipynb_checkpoints/unittests-checkpoint.py:10"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/.ipynb_checkpoints/unittests-checkpoint.py:22"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/.ipynb_checkpoints/unittests-checkpoint.py:24"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/.ipynb_checkpoints/unittests-checkpoint.py:34"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/.ipynb_checkpoints/unittests-checkpoint.py:36"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/.ipynb_checkpoints/unittests-checkpoint.py:57"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/.ipynb_checkpoints/unittests-checkpoint.py:58"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/.ipynb_checkpoints/unittests-checkpoint.py:59"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/unittests.py:10"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/unittests.py:22"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/unittests.py:24"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/unittests.py:34"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/unittests.py:36"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/unittests.py:57"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/unittests.py:58"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/unittests.py:59"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/.pytest_cache/v/cache/nodeids:3"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/.pytest_cache/v/cache/nodeids:4"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/.pytest_cache/v/cache/nodeids:5"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/bam_files/.ipynb_checkpoints/memray-flamegraph-output-checkpoint.html:306"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "find",
+      "file": "src/read_process.py",
+      "line": 417,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "src/core.py:15"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/read_process-checkpoint.py:284"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/read_process-checkpoint.py:331"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/read_process.py:519"
+        },
+        {
+          "rule": "called_internally",
+          "location": "tests/unittests.py:115"
+        },
+        {
+          "rule": "called_internally",
+          "location": "tests/unittests.py:116"
+        },
+        {
+          "rule": "called_internally",
+          "location": "tests/bam_files/.ipynb_checkpoints/memray-flamegraph-output-checkpoint.html:306"
+        },
+        {
+          "rule": "called_internally",
+          "location": "tests/bam_files/.ipynb_checkpoints/memray-flamegraph-output-checkpoint.html:331"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/unittests.py:115"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/unittests.py:116"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/bam_files/.ipynb_checkpoints/memray-flamegraph-output-checkpoint.html:265"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/bam_files/.ipynb_checkpoints/memray-flamegraph-output-checkpoint.html:306"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/bam_files/.ipynb_checkpoints/memray-flamegraph-output-checkpoint.html:331"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "remove_softclipped_bases",
+      "file": "src/read_process.py",
+      "line": 430,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "src/core.py:15"
+        },
+        {
+          "rule": "imported_by_name",
+          "location": "tests/unittests.py:10"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/read_process-checkpoint.py:287"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/read_process-checkpoint.py:314"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/read_process.py:491"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/read_process.py:497"
+        },
+        {
+          "rule": "called_internally",
+          "location": "tests/.ipynb_checkpoints/unittests-checkpoint.py:63"
+        },
+        {
+          "rule": "called_internally",
+          "location": "tests/.ipynb_checkpoints/unittests-checkpoint.py:66"
+        },
+        {
+          "rule": "called_internally",
+          "location": "tests/.ipynb_checkpoints/unittests-checkpoint.py:72"
+        },
+        {
+          "rule": "called_internally",
+          "location": "tests/unittests.py:63"
+        },
+        {
+          "rule": "called_internally",
+          "location": "tests/unittests.py:66"
+        },
+        {
+          "rule": "called_internally",
+          "location": "tests/unittests.py:72"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/.ipynb_checkpoints/unittests-checkpoint.py:11"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/.ipynb_checkpoints/unittests-checkpoint.py:63"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/.ipynb_checkpoints/unittests-checkpoint.py:66"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/.ipynb_checkpoints/unittests-checkpoint.py:72"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/unittests.py:11"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/unittests.py:63"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/unittests.py:66"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/unittests.py:72"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/.pytest_cache/v/cache/nodeids:6"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "get_edit_information",
+      "file": "src/read_process.py",
+      "line": 465,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "src/core.py:15"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/read_process-checkpoint.py:309"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/read_process-checkpoint.py:406"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/read_process.py:613"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/integration_tests.ipynb:198"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/integration_tests.ipynb:251"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/integration_tests.ipynb:472"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/integration_tests.ipynb:537"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/integration_tests.ipynb:874"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/integration_tests.ipynb:954"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/integration_tests.ipynb:1363"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/integration_tests.ipynb:1415"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/integration_tests.ipynb:1467"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/integration_tests.ipynb:1519"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/integration_tests.ipynb:1571"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/integration_tests.ipynb:1623"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/integration_tests.ipynb:1677"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/integration_tests.ipynb:1730"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/integration_tests.ipynb:1783"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/integration_tests.ipynb:1836"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/integration_tests.ipynb:1894"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/integration_tests.ipynb:1947"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/integration_tests.ipynb:2000"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/integration_tests.ipynb:2063"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/integration_tests.ipynb:2116"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/integration_tests.ipynb:2338"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "get_edit_information_wrapper",
+      "file": "src/read_process.py",
+      "line": 577,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "imported_by_name",
+          "location": "src/core.py:15"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/read_process-checkpoint.py:158"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/read_process-checkpoint.py:387"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/read_process.py:265"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/integration_tests.ipynb:198"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/integration_tests.ipynb:251"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/integration_tests.ipynb:472"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/integration_tests.ipynb:537"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/integration_tests.ipynb:874"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/integration_tests.ipynb:954"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/integration_tests.ipynb:1363"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/integration_tests.ipynb:1415"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/integration_tests.ipynb:1467"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/integration_tests.ipynb:1519"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/integration_tests.ipynb:1571"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/integration_tests.ipynb:1623"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/integration_tests.ipynb:1677"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/integration_tests.ipynb:1730"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/integration_tests.ipynb:1783"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/integration_tests.ipynb:1836"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/integration_tests.ipynb:1894"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/integration_tests.ipynb:1947"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/integration_tests.ipynb:2000"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/integration_tests.ipynb:2063"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/integration_tests.ipynb:2116"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/integration_tests.ipynb:2338"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "upper",
+      "file": "src/read_process.py",
+      "line": 381,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/read_process-checkpoint.py:256"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/read_process-checkpoint.py:277"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/read_process-checkpoint.py:345"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/read_process-checkpoint.py:347"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/read_process-checkpoint.py:403"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/read_process.py:383"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/read_process.py:410"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/read_process.py:533"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/read_process.py:535"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/read_process.py:609"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/utils.py:493"
+        },
+        {
+          "rule": "called_internally",
+          "location": "tests/bam_files/.ipynb_checkpoints/memray-flamegraph-output-checkpoint.html:306"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/bam_files/.ipynb_checkpoints/memray-flamegraph-output-checkpoint.html:306"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/bam_files/.ipynb_checkpoints/memray-flamegraph-output-checkpoint.html:331"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "lower",
+      "file": "src/read_process.py",
+      "line": 385,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/read_process-checkpoint.py:257"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/read_process-checkpoint.py:352"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/read_process-checkpoint.py:398"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/read_process.py:387"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/read_process.py:540"
+        },
+        {
+          "rule": "called_internally",
+          "location": "src/read_process.py:604"
+        },
+        {
+          "rule": "called_internally",
+          "location": "tests/bam_files/.ipynb_checkpoints/memray-flamegraph-output-checkpoint.html:306"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/bam_files/.ipynb_checkpoints/memray-flamegraph-output-checkpoint.html:306"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/bam_files/.ipynb_checkpoints/memray-flamegraph-output-checkpoint.html:331"
+        }
+      ],
+      "removal_note": null
+    },
+    {
+      "name": "nothing",
+      "file": "src/read_process.py",
+      "line": 389,
+      "classification": "KEEP",
+      "evidence": [
+        {
+          "rule": "called_internally",
+          "location": "src/.ipynb_checkpoints/read_process-checkpoint.py:258"
+        },
+        {
+          "rule": "referenced_in_tests",
+          "location": "tests/conftest.py:12"
+        }
+      ],
+      "removal_note": null
+    }
+  ]
+}

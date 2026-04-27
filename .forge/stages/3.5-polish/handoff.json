@@ -1,0 +1,61 @@
+{
+  "stage_id": "3.5-polish",
+  "completed_utc": "2026-04-26T00:00:00Z",
+  "status": "READY_FOR_REVIEW",
+  "iterations_used": 1,
+  "artifacts_produced": [
+    {
+      "path": "stages/3.5-polish/polish-report.md",
+      "description": "Gap analysis, iteration log, quality sweep, and final verification results"
+    }
+  ],
+  "gaps_found": [
+    {
+      "id": "G-1",
+      "function": "filter_sites_using_tabulation_bed",
+      "file": "marine.py",
+      "issue": "Pre-existing docstring used Arguments: bullet style instead of Google Args: style",
+      "resolved": true
+    },
+    {
+      "id": "G-2",
+      "function": "generate_and_split_bed_files_for_all_positions",
+      "file": "marine.py",
+      "issue": "Pre-existing docstring listed stale strand_conversion arg not in function signature; missing tabulation_bed arg",
+      "resolved": true
+    },
+    {
+      "id": "G-3",
+      "function": "get_unique_barcodes_for_reads_in_bamfile",
+      "file": "marine.py",
+      "issue": "Pool worker missing Pool.map marker (D-8); tuple described as 5-tuple but actual signature is 7-tuple",
+      "resolved": true
+    },
+    {
+      "id": "G-4",
+      "function": "process_combination_for_split",
+      "file": "marine.py",
+      "issue": "Pool worker missing Worker function for Pool.map marker (D-8)",
+      "resolved": true
+    },
+    {
+      "id": "G-5",
+      "function": "merge_files_by_chromosome",
+      "file": "src/utils.py",
+      "issue": "Pool worker missing Worker function for Pool.map marker (D-8); no Args section",
+      "resolved": true
+    }
+  ],
+  "open_issues": [],
+  "final_test_results": {
+    "unit_tests": "13/13 PASS",
+    "docstring_issues": 0,
+    "pool_worker_d8_compliance": "6/6"
+  },
+  "resumption_context": "Stage 3.5-polish COMPLETE. 5 pre-existing docstrings corrected: non-Google style converted, stale args removed, 3 pool workers marked per D-8. Zero code body changes. All 13 unit tests pass. Ready for forge review stage.",
+  "next_stage_must_read": [
+    "stages/3.5-polish/polish-report.md",
+    "stages/3-implement/implementation-report.md",
+    "stages/2-architect/architecture-plan.md"
+  ]
+}

@@ -1,0 +1,88 @@
+{
+  "schema_version": "1.0.0",
+  "stage_id": "4-review",
+  "completed_utc": "2026-04-26T23:25:00Z",
+  "status": "CHANGES_REQUIRED",
+  "decision_gate": "CHANGES_REQUIRED",
+  "review_round": 1,
+  "artifacts_produced": [
+    {
+      "path": "stages/4-review/review-report.md",
+      "description": "Full review report with Pass 1 (contract compliance), Pass 2 (security), adversarial spec verification, and quality scorecard"
+    },
+    {
+      "path": "stages/4-review/verified-clean.json",
+      "description": "PASS verdicts to skip re-checking on next review round"
+    },
+    {
+      "path": "stages/4-review/review-fixup-prompt.md",
+      "description": "Ordered fixup checklist for the revision stage"
+    }
+  ],
+  "findings_summary": {
+    "critical": 1,
+    "major": 3,
+    "minor": 4,
+    "info": 1
+  },
+  "findings": [
+    {"id": "C-1", "severity": "CRITICAL", "category": "SCOPE_VIOLATION", "title": "Out-of-scope rewrite of marine_environment2.yaml", "file": "marine_environment2.yaml"},
+    {"id": "M-1", "severity": "MAJOR", "category": "PORTABILITY", "title": "Hardcoded absolute path in tests/unittests.py", "file": "tests/unittests.py:113,130"},
+    {"id": "M-2", "severity": "MAJOR", "category": "DOCUMENTATION", "title": "tests/conftest.py undocumented in implementation report", "file": "tests/conftest.py"},
+    {"id": "M-3", "severity": "MAJOR", "category": "PROCESS", "title": "Source changes uncommitted; per-bug-commit sequencing unverifiable", "file": "(working tree)"},
+    {"id": "M-4", "severity": "MINOR", "category": "DOCUMENTATION", "title": "Function-count numbers in implementation report are off", "file": ".forge/stages/3-implement/implementation-report.md"},
+    {"id": "M-5", "severity": "MINOR", "category": "TOOLING", "title": "ADRs lack affects_files frontmatter", "file": ".forge/stages/2-architect/adrs/"},
+    {"id": "M-6", "severity": "MINOR", "category": "DOCUMENTATION", "title": "Task 6 implementation-report wording implies both lines were buggy", "file": ".forge/stages/3-implement/implementation-report.md"},
+    {"id": "M-7", "severity": "MINOR", "category": "TEST_QUALITY", "title": "Stage 2 adversarial confirms PASS — informational only", "file": "tests/unittests.py:124"}
+  ],
+  "verification": {
+    "unit_tests": "PASS (13/13 in marine_environment, Python 3.10, re-run independently)",
+    "integration_tests": "NOT_RE_RUN (self-reported PASS in implementation report)",
+    "lint": "NOT_RUN_IN_REVIEW",
+    "build": "N/A"
+  },
+  "quality_scores": {
+    "correctness": "PASS_WITH_NOTES",
+    "completeness": "PASS_WITH_NOTES",
+    "maintainability": "PASS_WITH_NOTES",
+    "security": "PASS",
+    "notes": [
+      "correctness: M-1 hardcoded path will fail in CI on hosts other than developer's",
+      "completeness: conftest.py and yaml changes are documentation gaps, not code gaps",
+      "maintainability: uncommitted working tree (M-3) reduces auditability"
+    ]
+  },
+  "ac_coverage": {
+    "total": 10,
+    "passing": 10,
+    "evidence_strong": 9,
+    "evidence_weak": 1,
+    "evidence_missing": 0,
+    "weak_items": ["AC-7 integration tests not re-run in review (self-reported only)"]
+  },
+  "decision_compliance": {
+    "total_decisions": 12,
+    "followed": 11,
+    "deviated": 0,
+    "unverifiable": 1,
+    "unverifiable_items": ["DR-6 per-bug commit sequencing — no commits exist yet (see M-3)"]
+  },
+  "adr_drift": {
+    "total_adrs": 8,
+    "consistent": 7,
+    "divergent": 0,
+    "ambiguous": 0,
+    "unverifiable": 1,
+    "notes": "ADRs lack affects_files frontmatter; manual drift check performed (see M-5)"
+  },
+  "open_issues": [
+    "C-1, M-1, M-2, M-3 must be addressed before APPROVED verdict",
+    "Integration tests not re-run in review (relied on implementation-stage results)"
+  ],
+  "next_stage": "4.5-revision",
+  "resumption_context": "Review round 1 produced CHANGES_REQUIRED verdict. The bug fixes (C1-C4, H5, C2/M2) and docstring/cleanup pass are correctly implemented; 13/13 unit tests pass. However the working tree contains an out-of-scope rewrite of marine_environment2.yaml (281 -> 20 lines, removing all version pins) that the architecture plan Section 11 explicitly forbids; a hardcoded absolute path in tests/unittests.py:113,130 will break CI on any other host; tests/conftest.py is undocumented; and source changes are uncommitted (defeating the per-bug-commit sequencing of ADR-01/DR-6). Apply the fixes listed in review-fixup-prompt.md, then re-run /forge review.",
+  "next_stage_must_read": [
+    "stages/4-review/review-fixup-prompt.md",
+    "stages/4-review/review-report.md"
+  ]
+}

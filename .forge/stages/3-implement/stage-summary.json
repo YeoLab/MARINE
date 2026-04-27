@@ -1,0 +1,36 @@
+{
+  "stage_id": "3-implement",
+  "completed_utc": "2026-04-26T23:01:46Z",
+  "artifacts_produced": [
+    {
+      "path": "stages/3-implement/implementation-report.md",
+      "sha256": "see_file",
+      "description": "Full task-by-task implementation record with AC verification table"
+    },
+    {
+      "path": "stages/2-architect/unused-functions-audit.json",
+      "sha256": "see_file",
+      "description": "Static AST audit of 95 functions; 1 removal (generate_empty_matrix_file)"
+    }
+  ],
+  "key_decisions": [
+    {
+      "dr_id": "DR-T9",
+      "summary": "Tasks 2-8 were already applied before this session; verified via source inspection + 12/13 test pass"
+    },
+    {
+      "dr_id": "DR-T11",
+      "summary": "Pool worker functions (calculate_coverage, calculate_sailor_score) reclassified KEEP — passed as objects to pool.starmap/.apply, not detected by name( grep"
+    },
+    {
+      "dr_id": "DR-T12",
+      "summary": "generate_empty_matrix_file removed (body: pass, zero callers). Human approved 2026-04-26."
+    }
+  ],
+  "open_issues": [],
+  "resumption_context": "Stage 3-implement is COMPLETE. All 12 tasks done: marine2.py deleted, 5 bugs fixed (C1-C4, H5), tracemalloc/start_time moved inside run() (C2/M2), Google-style docstrings on 59 functions across 4 files, generate_empty_matrix_file removed. 13 unit tests pass. Integration tests (bulk strandedness, SC, sailor) all pass. Next stage is 3.5-polish.",
+  "next_stage_must_read": [
+    "stages/3-implement/implementation-report.md",
+    "stages/2-architect/architecture-plan.md"
+  ]
+}

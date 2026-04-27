@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0.0",
+  "review_round": 1,
+  "generated_utc": "2026-04-26T23:20:00Z",
+  "verified_patterns": [
+    {"ac_id": "AC-1", "verdict": "PASS", "evidence": "marine2.py absent from working tree; no rename in git status"},
+    {"ac_id": "AC-2", "verdict": "PASS", "evidence": "src/utils.py:548-549 end-clamp; tests/unittests.py:88 partial-window assertion"},
+    {"ac_id": "AC-3", "verdict": "PASS", "evidence": "src/utils.py:878 .format(output_folder, contig); test_get_coverage_wrapper_no_header_kwarg"},
+    {"ac_id": "AC-4", "verdict": "PASS", "evidence": "marine.py:291 Pool(processes); test_marine_pool_uses_processes_param"},
+    {"ac_id": "AC-5", "verdict": "PASS", "evidence": "marine.py:337-338 start_time and tracemalloc as first two run() statements; test_marine_run_starts_time_at_top"},
+    {"ac_id": "AC-6", "verdict": "PASS", "evidence": "13/13 unit tests pass under marine_environment Python 3.10 (re-run independently in review)"},
+    {"ac_id": "AC-8", "verdict": "PASS", "evidence": "AST walk: 94/94 functions across 4 target files have docstrings"},
+    {"ac_id": "AC-9", "verdict": "PASS", "evidence": ".forge/stages/2-architect/unused-functions-audit.json with 95 entries"},
+    {"ac_id": "AC-10", "verdict": "PASS", "evidence": "generate_empty_matrix_file removed from src/utils.py; TestPublicAPIPreserved confirms via hasattr"},
+    {"area": "Decision Compliance DR-1..DR-5,DR-7..DR-12", "verdict": "PASS", "evidence": "all decisions implemented as specified; see review-report.md table"},
+    {"area": "ADR Drift (ADR-02..ADR-08)", "verdict": "CONSISTENT", "evidence": "manual drift check; ADR-01 unverifiable due to no commits"},
+    {"area": "Pool Worker D-8 markers", "verdict": "PASS", "evidence": "all 6 pool workers carry 'Worker function for Pool.map/imap_unordered' marker"},
+    {"area": "Threat Model Compliance", "verdict": "PASS", "evidence": "no new attack surface; no new imports; no new I/O paths"}
+  ],
+  "open_findings": [
+    {"id": "C-1", "severity": "CRITICAL", "category": "SCOPE_VIOLATION", "summary": "Out-of-scope rewrite of marine_environment2.yaml"},
+    {"id": "M-1", "severity": "MAJOR", "category": "PORTABILITY", "summary": "Hardcoded absolute path in tests/unittests.py"},
+    {"id": "M-2", "severity": "MAJOR", "category": "DOCUMENTATION", "summary": "tests/conftest.py undocumented in implementation report"},
+    {"id": "M-3", "severity": "MAJOR", "category": "PROCESS", "summary": "Source changes uncommitted; per-bug-commit sequencing unverifiable"}
+  ]
+}
